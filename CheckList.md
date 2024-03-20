@@ -1,3 +1,3 @@
  ## Tarefas
 
-- [ ] Teste
+- [x] Teste
