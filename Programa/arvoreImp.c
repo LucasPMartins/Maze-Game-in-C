@@ -1,11 +1,11 @@
-#include "arvore_binaria.h"
+#include "arvore.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 NoArvore* criarNo(int dado) {
     NoArvore *novoNo = (NoArvore*)malloc(sizeof(NoArvore));
     if (novoNo == NULL) {
-        printf("Erro ao alocar memória para novo nó.\n");
+        printf("Erro ao alocar memÃ³ria para novo nÃ³.\n");
         exit(EXIT_FAILURE);
     }
     novoNo->dado = dado;
@@ -48,7 +48,7 @@ void percorrerEmOrdemAux(NoArvore *no) {
 }
 
 void percorrerEmOrdem(ArvoreBinaria *arvore) {
-    printf("Árvore em ordem: ");
+    printf("Ãrvore em ordem: ");
     percorrerEmOrdemAux(arvore->raiz);
     printf("\n");
 }
