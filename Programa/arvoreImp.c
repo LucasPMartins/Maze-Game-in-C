@@ -1,4 +1,5 @@
 #include "arvore.h"
+#include "grafosImp.c"
 #include <stdio.h>
 #include <stdlib.h>
 
