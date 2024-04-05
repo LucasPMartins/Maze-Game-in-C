@@ -22,10 +22,10 @@
    - [ ] Função para imprimir os caminhos
 
 - [ ] Ranking
-    - [ ] Ordenar o ranking
-    - [ ] Criar TAD ranking
-    - [ ] Limpar histórico
-    - [ ] Apagar pontuações isoladas
+    - [x] Ordenar o ranking
+    - [x] Criar TAD ranking
+    - [x] Limpar histórico
+    - [x] Apagar pontuações isoladas
     - [ ] exibir por tempo total ou pontuação
      
  - [ ] Menu
