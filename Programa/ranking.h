@@ -16,12 +16,12 @@ typedef struct {
 
 void inicializaRanking(Ranking *ranking);
 
-void insertionSort(Ranking *ranking);
+void insertionSort(Ranking *ranking,int tipo);
 
 void adicionaJogador(Ranking *ranking, char *nome, double tempoTotal,
                      int pontos);
 
-void exibeRanking(const Ranking *ranking);
+void exibeRanking(const Ranking *ranking,int tipo);
 
 void salvarRanking(const Ranking *ranking);
 
