@@ -1,6 +1,7 @@
 #ifndef GRAFOS_H_INCLUDED
 #define GRAFOS_H_INCLUDED
 
+#include "ranking.h"
 #define MAXNUMVERTICES 100
 #define MAXNUMARESTAS 4500
 
@@ -10,8 +11,8 @@ typedef int TipoPeso;
 typedef struct TipoItem {
   TipoValorVertice vertice;
   TipoPeso peso;
-  int ehSaida;     // 1 para saÌda e 0 para padr„o
-  int ehSumidouro; // 1 para sumidouro e 0 para padr„o
+  int ehSaida;     // 1 para sa√≠da e 0 para padr√£o
+  int ehSumidouro; // 1 para sumidouro e 0 para padr√£o
 } TipoItem;
 
 struct TipoCelula {
@@ -29,6 +30,7 @@ typedef struct TipoGrafo {
   TipoLista adj[MAXNUMVERTICES];
   int numVertices;
   int numArestas;
+  int ehAreaCentral;
 } TipoGrafo;
 
 void FGVazio(TipoGrafo *grafo);
@@ -42,5 +44,6 @@ void exibirOpcoes(TipoGrafo *grafo, TipoValorVertice verticeAtual);
 TipoApontador encontrarVertice(TipoGrafo *grafo, TipoValorVertice verticeAtual,
                                int escolha);
 void percorrerGrafo(TipoGrafo *grafo, TipoValorVertice verticeInicial);
-
+void percorrerAreaCentral(TipoGrafo *grafo, int verticeInicial,
+                          Jogador *jogador);
 #endif // GRAFOS_H_INCLUDED

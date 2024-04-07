@@ -4,30 +4,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> // Para a função sleep_ms
+#include <sys/time.h>
+#include <time.h> // Para a funÃ§Ã£o sleep_ms
 
-void print_logo() {
-  printf(" __     __     _   _     __   __     __     __ "
-         "\n");
-  printf("/\\  _\\   /\\  _\\   /\\ \"-.\\ \\   /\\__  _\\ /\\  == \\   "
-         "/\\  __ \\   /\\ \\      \n");
-  printf("\\ \\ \\__  \\ \\  _\\   \\ \\ \\-.  \\  \\//\\ \\/ \\ \\  __<   "
-         "\\ \\  _ \\  \\ \\ \\_ \n");
-  printf(" \\ \\__\\  \\ \\_\\  \\ \\\\ \"\\\\    \\ \\\\  \\ \\_\\ "
-         "\\\\  \\ \\\\ \\\\  \\ \\__\\ \n");
-  printf("  \\/__/   \\/_/   \\// \\//     \\//   \\// //   "
-         "\\//\\//   \\/___/\n");
-  printf(" _    _     __     __     __               __        "
-         "     \n");
-  printf("/\\ \"-./  \\   /\\  _ \\   /\\_  \\   /\\  __\\             "
-         "/\\_\\                     \n");
-  printf("\\ \\ \\-./\\ \\  \\ \\  _ \\  \\//  /_  \\ \\  _\\            "
-         "/\\ \\_\\                        \n");
-  printf(" \\ \\\\ \\ \\\\  \\ \\\\ \\\\   /\\__\\  \\ \\__\\        "
-         "  \\ \\/ / /                            \n");
-  printf("  \\//  \\//   \\//\\//   \\/__/   \\/__/           "
-         "\\///                  \n");
+void print_logo()
+{
+  printf(" ______     ______     __   __     ______   ______     ______     __ \n");      
+  printf("/\\  ___\\   /\\  ___\\   /\\ \"-.\\ \\   /\\__  _\\ /\\  == \\   /\\  __ \\   /\\ \\      \n");
+  printf("\\ \\ \\____  \\ \\  __\\   \\ \\ \\-.  \\  \\/_/\\ \\/ \\ \\  __<   \\ \\  __ \\  \\ \\ \\____ \n");
+  printf(" \\ \\_____\\  \\ \\_____\\  \\ \\_\\ \"\\_\\    \\ \\_\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\  \\ \\_____\\ \n");
+  printf("  \\/_____/   \\/_____/   \\/_/ \\/_/     \\/_/   \\/_/ /_/   \\/_/\\/_/   \\/_____/ \n");
+  printf("                                                                \n");
+  printf(" __    __     ______     ______     ______               ____             \n");
+  printf("/\\ \"-./  \\   /\\  __ \\   /\\___  \\   /\\  ___\\             /\\___\\                     \n");
+  printf("\\ \\ \\-./\\ \\  \\ \\  __ \\  \\/_/  /__  \\ \\  __\\            /\\ \\___\\                        \n");
+  printf(" \\ \\_\\ \\ \\_\\  \\ \\_\\ \\_\\   /\\_____\\  \\ \\_____\\          \\ \\/ / /                            \n");
+  printf("  \\/_/  \\/_/   \\/_/\\/_/   \\/_____/   \\/_____/           \\/_/_/                  \n");
 }
+
 
 void imprimelento(char *p, int N) {
   for (int i = 0; *(p + i) != '\0'; i++) {
@@ -36,48 +30,69 @@ void imprimelento(char *p, int N) {
   }
 }
 
-void iniciarJogo() {
+Jogador iniciarJogo() {
   ArvoreBinaria arvore = criarArvore();
-  TipoGrafo grafo1, grafo2, grafo3;
+  TipoGrafo grafo1, grafo2, grafo3, areaCentral;
   grafo1.numVertices = 3;
   grafo2.numVertices = 4;
   grafo3.numVertices = 5;
+  areaCentral.numVertices = 7;
 
   FGVazio(&grafo1);
   FGVazio(&grafo2);
   FGVazio(&grafo3);
+  FGVazio(&areaCentral);
 
-  // Conexões do Grafo 1
-  InsereAresta(0, 1, 1, &grafo1, 0, 0); // Aresta normal
-  InsereAresta(1, 2, 1, &grafo1, 1, 0); // Aresta para saída
-  InsereAresta(2, 0, 1, &grafo1, 0, 1); // Aresta para sumidouro
+  // ConexÃµes do Grafo 1
+  InsereAresta(0, 1, 0, &grafo1, 0, 0); // Aresta normal
+  InsereAresta(1, 2, 0, &grafo1, 1, 0); // Aresta para saÃ­da
+  InsereAresta(2, 0, 0, &grafo1, 0, 1); // Aresta para sumidouro
 
-  // Conexões do Grafo 2
-  InsereAresta(0, 1, 1, &grafo2, 0, 0); // Aresta normal
-  InsereAresta(1, 2, 1, &grafo2, 0, 0); // Aresta normal
-  InsereAresta(2, 3, 1, &grafo2, 1, 0); // Aresta para saída
-  InsereAresta(3, 1, 1, &grafo2, 0, 1); // Aresta para sumidouro
+  // ConexÃµes do Grafo 2
+  InsereAresta(0, 1, 0, &grafo2, 0, 0); // Aresta normal
+  InsereAresta(1, 2, 0, &grafo2, 0, 0); // Aresta normal
+  InsereAresta(2, 3, 0, &grafo2, 1, 0); // Aresta para saÃ­da
+  InsereAresta(3, 1, 0, &grafo2, 0, 1); // Aresta para sumidouro
 
-  // Conexões do Grafo 3 (grafo raiz)
-  InsereAresta(0, 1, 10, &grafo3, 0, 0); // Aresta ponderada
-  InsereAresta(1, 2, 20, &grafo3, 0, 0); // Aresta ponderada
-  InsereAresta(2, 3, 30, &grafo3, 1, 0); // Aresta ponderada para saída
-  InsereAresta(3, 4, 40, &grafo3, 0, 1); // Aresta ponderada para sumidouro
-  InsereAresta(4, 0, 50, &grafo3, 0,
-               0); // Aresta ponderada de volta ao início (opcional)
+  // ConexÃµes do Grafo 3 (grafo raiz)
+  InsereAresta(0, 1, 0, &grafo3, 0, 0); // Aresta ponderada
+  InsereAresta(1, 2, 0, &grafo3, 0, 0); // Aresta ponderada
+  InsereAresta(2, 3, 0, &grafo3, 1, 0); // Aresta ponderada para saÃ­da
+  InsereAresta(3, 4, 0, &grafo3, 0, 1); // Aresta ponderada para sumidouro
+  InsereAresta(4, 0, 0, &grafo3, 0,
+               0); // Aresta ponderada de volta ao inÃ­cio (opcional)
 
-  // Inserindo os grafos na árvore
-  inserir(&arvore, grafo1);
-  inserir(&arvore, grafo2);
-  inserir(&arvore, grafo3);
+  // Adicionando arestas Ã  Ã¡rea central
+  InsereAresta(0, 1, 5, &areaCentral, 0, 0); // Aresta ponderada comum
+  InsereAresta(1, 2, 3, &areaCentral, 0, 1); // Sumidouro no vÃ©rtice 2 com peso
+  InsereAresta(1, 3, 2, &areaCentral, 1, 0); // SaÃ­da no vÃ©rtice 3 com peso
+  InsereAresta(2, 4, 1, &areaCentral, 0, 1);
+  InsereAresta(2, 2, 1, &areaCentral, 0, 0);
 
-  // Iniciando o jogo percorrendo a árvore em pós-ordem e jogando cada fase
-  percorrerPosOrdemInterativo(arvore.raiz);
+  // Inserindo os grafos na Ã¡rvore
+  inserir(&arvore, grafo1, 0);
+  inserir(&arvore, grafo2, 0);
+  inserir(&arvore, grafo3, 0);
+  inserir(&arvore, areaCentral, 1);
 
+  // Iniciando o jogo percorrendo a Ã¡rvore em pÃ³s-ordem e jogando cada fase
+  Jogador jogador;
+  jogador.pontos = 0;
+  jogador.tempoTotal = 0;
+  jogador.fasesCompletas = 0;
+  printf("Entre com o nome do jogador: ");
+  fgets(jogador.nome, sizeof(jogador.nome), stdin);
+  // Remove o caractere de nova linha, se presente
+  jogador.nome[strcspn(jogador.nome, "\n")] = 0;
+  printf("Bem-vindo, %s!\n", jogador.nome);
+  iniciarJogoComPosOrdem(&arvore, &jogador);
   liberarArvore(&arvore);
+  return jogador;
 }
 
 int main() {
+  struct timeval inicio, fim;
+  double tempo_total;
   int op;
   Ranking *ranking = (Ranking *)malloc(sizeof(Ranking));
 
@@ -98,10 +113,23 @@ int main() {
     case 1:
       print_logo();
       printf("\nIniciando o jogo...\n");
-
-      iniciarJogo();
-
+      gettimeofday(&inicio, NULL);
+      Jogador jogador =
+          iniciarJogo(); // Essa funÃ§Ã£o precisa ser ajustada conforme descrito
+      gettimeofday(&fim, NULL);
+      tempo_total = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
+      printf("Tempo total de jogo: %.2f segundos\n", tempo_total);
+      jogador.tempoTotal = tempo_total;
       printf("\nRetornando ao menu principal...\n");
+
+      // Adiciona o jogador ao ranking
+      adicionaJogador(ranking, jogador.nome, jogador.tempoTotal,
+                      jogador.pontos);
+      printf("Resultado adicionado ao ranking.\n");
+
+      // Salva o ranking atualizado
+      salvarRanking(ranking);
+      printf("Ranking atualizado salvo com sucesso.\n");
       break;
     case 2:
       print_logo();
@@ -173,7 +201,7 @@ int main() {
 
       break;
     default:
-      printf("\nOpção inválida!\n");
+      printf("\nOpcao invalida!\n");
     }
   } while (op != 0);
 

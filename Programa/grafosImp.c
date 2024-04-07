@@ -1,4 +1,5 @@
 #include "grafos.h"
+#include "ranking.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -85,7 +86,7 @@ void LiberaGrafo(TipoGrafo *grafo) {
 TipoApontador encontrarVertice(TipoGrafo *grafo, TipoValorVertice verticeAtual,
                                int escolha) {
   if (escolha < 1) {
-    printf("Op��o inv�lida. Tente novamente.\n");
+    printf("Opcao invalida. Tente novamente.\n");
     return NULL;
   }
 
@@ -98,7 +99,7 @@ TipoApontador encontrarVertice(TipoGrafo *grafo, TipoValorVertice verticeAtual,
   }
 
   if (aux == NULL || contador != escolha) {
-    printf("Op��o inv�lida. Tente novamente.\n");
+    printf("Opcao invalida. Tente novamente.\n");
     return NULL;
   }
 
@@ -107,44 +108,44 @@ TipoApontador encontrarVertice(TipoGrafo *grafo, TipoValorVertice verticeAtual,
 
 void exibirOpcoes(TipoGrafo *grafo, TipoValorVertice verticeAtual) {
   int contador = 1;
-  printf("\nOp��es de movimento a partir da sala %d:\n", verticeAtual);
+  printf("\nOpcoes de movimento a partir da sala %d:\n", verticeAtual);
 
   TipoApontador adjacente = grafo->adj[verticeAtual].primeiro->prox;
   if (!adjacente) {
-    printf("Sem sa�das dispon�veis.\n");
+    printf("Sem saidas disponiveis.\n");
     return;
   }
 
   while (adjacente) {
     printf("%d. Sala %d", contador, adjacente->item.vertice);
     if (adjacente->item.ehSaida)
-      printf(" - Sa�da");
+      printf(" - Saida");
     if (adjacente->item.ehSumidouro)
       printf(" - Sumidouro");
     printf("\n");
     adjacente = adjacente->prox;
     contador++;
   }
-  printf("Escolha uma op��o ou digite -1 para sair.\n");
+  printf("Escolha uma opcao ou digite -1 para sair.\n");
 }
 
 void percorrerGrafo(TipoGrafo *grafo, TipoValorVertice verticeInicial) {
   TipoValorVertice verticeAtual = verticeInicial;
-  printf("Explorando o labirinto...\n");
+  printf("\n\nExplorando o labirinto...\n");
 
   while (1) {
     exibirOpcoes(grafo, verticeAtual);
     printf("Sua escolha: ");
     int escolha;
     if (scanf("%d", &escolha) != 1) {
-      printf("Entrada inv�lida.\n");
+      printf("Entrada invalida.\n");
       while (getchar() != '\n')
         ; // Limpa o buffer
       continue;
     }
 
     if (escolha == -1) {
-      printf("Explora��o encerrada.\n");
+      printf("Exploracao encerrada.\n");
       break;
     }
 
@@ -158,8 +159,68 @@ void percorrerGrafo(TipoGrafo *grafo, TipoValorVertice verticeInicial) {
       break;
     }
     if (proximo->item.ehSaida) {
-      printf("Sa�da encontrada! Fim da explora��o.\n");
+      printf("Saida encontrada! Fim da exploracao.\n");
       break;
     }
+  }
+}
+
+void percorrerAreaCentral(TipoGrafo *grafo, int verticeInicial,
+                          Jogador *jogador) {
+  int verticeAtual = verticeInicial;
+  int verticeAnterior = -1; // Inicializa sem um vértice anterior válido
+  int escolha;
+  TipoApontador adj;
+
+  printf("\n\nIniciando a exploração da área central...\n");
+
+  while (1) {
+    printf("Você está no vértice %d com %d pontos.\n", verticeAtual,
+           jogador->pontos);
+    exibirOpcoes(grafo, verticeAtual); // Lista as conexões e seus pesos
+
+    scanf("%d", &escolha);
+    while (getchar() != '\n')
+      ; // Limpa o buffer de entrada
+
+    if (escolha == -1) {
+      printf("Exploração da área central encerrada.\n");
+      break;
+    }
+
+    adj = encontrarVertice(grafo, verticeAtual, escolha);
+    if (adj == NULL) {
+      printf("Opção inválida. Tente novamente.\n");
+      continue;
+    }
+
+    // Acumula pontos baseado no peso da aresta
+    jogador->pontos += adj->item.peso;
+    printf("Movendo para o vértice %d. Pontos acumulados: %d\n",
+           adj->item.vertice, jogador->pontos);
+
+    if (adj->item.ehSumidouro) {
+      printf("Você chegou a um sumidouro! ");
+      if (jogador->pontos > 0) {
+        printf("Usando 1 ponto para retroceder.\n");
+        jogador->pontos -= 1; // Usa um ponto para "retroceder" a ação
+        verticeAtual = verticeAnterior != -1
+                           ? verticeAnterior
+                           : verticeInicial; // Volta ao vértice anterior ou
+                                             // inicial se não houver anterior
+        continue; // Continua a exploração a partir do vértice anterior
+      } else {
+        printf(
+            "Não possui pontos suficientes para retroceder. Jogo encerrado.\n");
+        break; // Termina o jogo se não há pontos para retroceder
+      }
+    } else if (adj->item.ehSaida) {
+      printf("Você encontrou uma saída com %d pontos! Exploração concluída.\n",
+             jogador->pontos);
+      break; // Encontrou uma saída, termina a exploração
+    }
+
+    verticeAnterior = verticeAtual;   // Atualiza o vértice anterior
+    verticeAtual = adj->item.vertice; // Atualiza o vértice atual para o próximo
   }
 }
