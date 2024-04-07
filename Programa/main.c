@@ -1,236 +1,182 @@
+#include "arvore.h"
 #include "grafos.h"
 #include "ranking.h"
-#include "arvore.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Windows.h>
-#include <conio.h> // Utilizado para usar teclas do teclado na sele√ß√£o de opc√µes
+#include <time.h> // Para a funÁ„o sleep_ms
 
-#define ANSI_COLOR_RED "\x1b[31m"     // Cor: Vermelho
-#define ANSI_COLOR_GREEN "\x1b[32m"   // Cor: Verde
-#define ANSI_COLOR_YELLOW "\x1b[33m"  // Cor: Amarelo
-#define ANSI_COLOR_BLUE "\x1b[34m"    // Cor: Azul
-#define ANSI_COLOR_MAGENTA "\x1b[35m" // Cor: Magenta
-#define ANSI_COLOR_CYAN "\x1b[36m"    // Cor: Ciano
-#define ANSI_COLOR_RESET "\x1b[0m"    // Cor: Padr√£o
+void print_logo() {
+  printf(" __     __     _   _     __   __     __     __ "
+         "\n");
+  printf("/\\  _\\   /\\  _\\   /\\ \"-.\\ \\   /\\__  _\\ /\\  == \\   "
+         "/\\  __ \\   /\\ \\      \n");
+  printf("\\ \\ \\__  \\ \\  _\\   \\ \\ \\-.  \\  \\//\\ \\/ \\ \\  __<   "
+         "\\ \\  _ \\  \\ \\ \\_ \n");
+  printf(" \\ \\__\\  \\ \\_\\  \\ \\\\ \"\\\\    \\ \\\\  \\ \\_\\ "
+         "\\\\  \\ \\\\ \\\\  \\ \\__\\ \n");
+  printf("  \\/__/   \\/_/   \\// \\//     \\//   \\// //   "
+         "\\//\\//   \\/___/\n");
+  printf(" _    _     __     __     __               __        "
+         "     \n");
+  printf("/\\ \"-./  \\   /\\  _ \\   /\\_  \\   /\\  __\\             "
+         "/\\_\\                     \n");
+  printf("\\ \\ \\-./\\ \\  \\ \\  _ \\  \\//  /_  \\ \\  _\\            "
+         "/\\ \\_\\                        \n");
+  printf(" \\ \\\\ \\ \\\\  \\ \\\\ \\\\   /\\__\\  \\ \\__\\        "
+         "  \\ \\/ / /                            \n");
+  printf("  \\//  \\//   \\//\\//   \\/__/   \\/__/           "
+         "\\///                  \n");
+}
 
-void print_logo();
-void imprimelento(char *p, int N);
+void imprimelento(char *p, int N) {
+  for (int i = 0; *(p + i) != '\0'; i++) {
+    printf("%c", *(p + i));
+    fflush(stdout);
+  }
+}
 
-int main()
-{
-  int op, i;
-  char tecla;
-  Ranking *ranking = (Ranking*)malloc(1*sizeof(Ranking));
+void iniciarJogo() {
+  ArvoreBinaria arvore = criarArvore();
+  TipoGrafo grafo1, grafo2, grafo3;
+  grafo1.numVertices = 3;
+  grafo2.numVertices = 4;
+  grafo3.numVertices = 5;
+
+  FGVazio(&grafo1);
+  FGVazio(&grafo2);
+  FGVazio(&grafo3);
+
+  // Conexıes do Grafo 1
+  InsereAresta(0, 1, 1, &grafo1, 0, 0); // Aresta normal
+  InsereAresta(1, 2, 1, &grafo1, 1, 0); // Aresta para saÌda
+  InsereAresta(2, 0, 1, &grafo1, 0, 1); // Aresta para sumidouro
+
+  // Conexıes do Grafo 2
+  InsereAresta(0, 1, 1, &grafo2, 0, 0); // Aresta normal
+  InsereAresta(1, 2, 1, &grafo2, 0, 0); // Aresta normal
+  InsereAresta(2, 3, 1, &grafo2, 1, 0); // Aresta para saÌda
+  InsereAresta(3, 1, 1, &grafo2, 0, 1); // Aresta para sumidouro
+
+  // Conexıes do Grafo 3 (grafo raiz)
+  InsereAresta(0, 1, 10, &grafo3, 0, 0); // Aresta ponderada
+  InsereAresta(1, 2, 20, &grafo3, 0, 0); // Aresta ponderada
+  InsereAresta(2, 3, 30, &grafo3, 1, 0); // Aresta ponderada para saÌda
+  InsereAresta(3, 4, 40, &grafo3, 0, 1); // Aresta ponderada para sumidouro
+  InsereAresta(4, 0, 50, &grafo3, 0,
+               0); // Aresta ponderada de volta ao inÌcio (opcional)
+
+  // Inserindo os grafos na ·rvore
+  inserir(&arvore, grafo1);
+  inserir(&arvore, grafo2);
+  inserir(&arvore, grafo3);
+
+  // Iniciando o jogo percorrendo a ·rvore em pÛs-ordem e jogando cada fase
+  percorrerPosOrdemInterativo(arvore.raiz);
+
+  liberarArvore(&arvore);
+}
+
+int main() {
+  int op;
+  Ranking *ranking = (Ranking *)malloc(sizeof(Ranking));
+
   carregarRanking(ranking);
-  do
-  {
-    system("cls");
+
+  do {
+
     print_logo();
     printf("\n                           1 - JOGAR\n");
     printf("                           2 - RANKING\n");
     printf("                           3 - SOBRE\n");
     printf("                           0 - SAIR\n\n");
-    printf("                       Digite sua Opcao:");
+    printf("                       Digite sua Opcao: ");
     scanf("%d", &op);
-    switch (op)
-    {
-    case 1:
+    getchar();
 
-    case 2:
-      system("cls");
+    switch (op) {
+    case 1:
       print_logo();
-      printf(ANSI_COLOR_GREEN);
+      printf("\nIniciando o jogo...\n");
+
+      iniciarJogo();
+
+      printf("\nRetornando ao menu principal...\n");
+      break;
+    case 2:
+      print_logo();
       printf("\n                         --===  RANKING  ===--\n\n");
-      printf(ANSI_COLOR_RESET);
       printf("                      1 - RANKING POR TEMPO TOTAL\n");
       printf("                      2 - RANKING POR PONTUACAO\n\n");
       printf("                          Digite sua Opcao:");
       scanf("%d", &op);
-      if(op == 1){
-        system("cls");
+      if (op == 1) {
+
         print_logo();
-        printf(ANSI_COLOR_GREEN);
         printf("\n                 --===  RANKING POR TEMPO TOTAL  ===--\n\n");
-        printf(ANSI_COLOR_RESET);
-        insertionSort(ranking,1);
-        exibeRanking(ranking,1);
-      }else if (op == 2){
-        system("cls");
+        insertionSort(ranking, 1);
+        exibeRanking(ranking, 1);
+      } else if (op == 2) {
         print_logo();
-        printf(ANSI_COLOR_GREEN);
         printf("\n                  --===  RANKING POR PONTUACAO  ===--\n\n");
-        printf(ANSI_COLOR_RESET);
-        insertionSort(ranking,2);
-        exibeRanking(ranking,2);
-      }else{
-        printf(ANSI_COLOR_RED);
+        insertionSort(ranking, 2);
+        exibeRanking(ranking, 2);
+      } else {
         printf("\n                            OPCAO INVALIDA!\n");
-        printf(ANSI_COLOR_RESET);
       }
-      printf(ANSI_COLOR_GREEN);
-      printf("\n                     Pressione \"ESC\" para voltar...");
-      printf(ANSI_COLOR_RESET);
-      while (1)
-      {
-        if (_kbhit())
-        {
-          tecla = _getch();
-          if (tecla == 27)
-          {        // Verifica se a tecla pressionada √© o c√≥digo ASCII do "Esc"
-            break; // Retorna ao menu anterior
-          }
-        }
-      }
+      printf("\n                     Pressione \"Enter\" para voltar...");
+      while (getchar() != '\n')
+        ;
       op = 4;
       break;
     case 3:
-      system("cls");
       print_logo();
-      printf(ANSI_COLOR_GREEN);
       printf("\n(!) SOBRE:\n");
-      printf(ANSI_COLOR_RESET);
-      printf("O jogo eh um labirinto interativo onde o jogador deve navegar por diferentes\n");
-      printf("areas, utilizando conceitos de  Grafos, Arvores Binarias e Ordenacao. Proje-\n");
-      printf("to feito para um  trabalho de conclusao de disciplina (Algoritmo e Estrutura\n");
+      printf("O jogo eh um labirinto interativo onde o jogador deve navegar "
+             "por diferentes\n");
+      printf("areas, utilizando conceitos de  Grafos, Arvores Binarias e "
+             "Ordenacao. Proje-\n");
+      printf("to feito para um  trabalho de conclusao de disciplina (Algoritmo "
+             "e Estrutura\n");
       printf("de Dados 2).\n");
       printf("Criado por: Lucas Martins, Caue Grassi e Pedro Trevisan\n");
-      printf(ANSI_COLOR_GREEN);
       printf("\n(?) COMO JOGAR:\n");
       printf("1 - Areas do Labirinto: ");
-      printf(ANSI_COLOR_RESET);
       printf("O jogador  interage  diretamente escolhendo caminhos\n");
-      printf("para sair do labirinto. Se escolher  um caminho sem saida, volta a sala ini-\n");
-      printf("cial (derrota). Encontrar a saida leva a uma nova area (avanco de fase).\n");
-      printf(ANSI_COLOR_GREEN);
+      printf("para sair do labirinto. Se escolher  um caminho sem saida, volta "
+             "a sala ini-\n");
+      printf("cial (derrota). Encontrar a saida leva a uma nova area (avanco "
+             "de fase).\n");
       printf("2 - Area  Central:  ");
-      printf(ANSI_COLOR_RESET);
       printf("Sala especial com pontuacao para avancos. Permite ao jo-\n");
-      printf("gador retroceder uma sala,sacrificando pontos. A derrota ocorre se encontrar\n");
+      printf("gador retroceder uma sala,sacrificando pontos. A derrota ocorre "
+             "se encontrar\n");
       printf("uma sala sem saida e o jogador estiver sem pontos.\n");
-      printf(ANSI_COLOR_GREEN);
       printf("3 - Dificuldade Progressiva: ");
-      printf(ANSI_COLOR_RESET);
       printf("O numero de salas aumenta a cada fase, tornando\n");
       printf("o percurso mais dificil.\n");
-      printf(ANSI_COLOR_GREEN);
       printf("4 - Mapa do Labirinto: ");
-      printf(ANSI_COLOR_RESET);
       printf("Caminhos levam  a Area Central. O  progresso eh feito\n");
-      printf("completando areas sucessivas. Todas  as areas  levam a Area Central.\n");
-      printf(ANSI_COLOR_GREEN);
+      printf("completando areas sucessivas. Todas  as areas  levam a Area "
+             "Central.\n");
       printf("5 - Sistema de Ranking: ");
-      printf(ANSI_COLOR_RESET);
       printf("Baseado no tempo e na pontuacao na Area Central.\n");
-      printf("Armazena as ultimas 10 vitorias, classificando os jogadores  por nome, tempo\n");
+      printf("Armazena as ultimas 10 vitorias, classificando os jogadores  por "
+             "nome, tempo\n");
       printf("total, tempo por area e pontuacao.\n");
-      printf(ANSI_COLOR_GREEN);
-      printf("\nPressione \"ESC\" para voltar...");
-      printf(ANSI_COLOR_RESET);
-      while (1)
-      {
-        if (_kbhit())
-        {
-          tecla = _getch();
-          if (tecla == 27)
-          {        // Verifica se a tecla pressionada √© o c√≥digo ASCII do "Esc"
-            break; // Retorna ao menu anterior
-          }
-        }
-      }
+      printf("\nPressione \"Enter\" para voltar...");
+      while (getchar() != '\n')
+        ;
       break;
     case 0:
-      system("cls");
-      printf(ANSI_COLOR_YELLOW);
-      printf("Saindo");
-      i = 3;
-      while (i > 0)
-      {
-        i--;
-        imprimelento("...", 400);
-        printf("\b\b\b   \b\b\b");
-      }
-      printf(ANSI_COLOR_RESET);
+      printf("Saindo do jogo...\n");
+
       break;
     default:
-      break;
+      printf("\nOpÁ„o inv·lida!\n");
     }
   } while (op != 0);
-  salvarRanking(ranking);
+
+  free(ranking);
   return 0;
 }
-
-void print_logo()
-{
-  printf(ANSI_COLOR_GREEN);
-  printf(" ______     ______     __   __     ______   ______     ______     __ \n");      
-  printf("/\\  ___\\   /\\  ___\\   /\\ \"-.\\ \\   /\\__  _\\ /\\  == \\   /\\  __ \\   /\\ \\      \n");
-  printf("\\ \\ \\____  \\ \\  __\\   \\ \\ \\-.  \\  \\/_/\\ \\/ \\ \\  __<   \\ \\  __ \\  \\ \\ \\____ \n");
-  printf(" \\ \\_____\\  \\ \\_____\\  \\ \\_\\ \"\\_\\    \\ \\_\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\  \\ \\_____\\ \n");
-  printf("  \\/_____/   \\/_____/   \\/_/ \\/_/     \\/_/   \\/_/ /_/   \\/_/\\/_/   \\/_____/ \n");
-  printf("                                                                \n");
-  printf(" __    __     ______     ______     ______               ____             \n");
-  printf("/\\ \"-./  \\   /\\  __ \\   /\\___  \\   /\\  ___\\             /\\___\\                     \n");
-  printf("\\ \\ \\-./\\ \\  \\ \\  __ \\  \\/_/  /__  \\ \\  __\\            /\\ \\___\\                        \n");
-  printf(" \\ \\_\\ \\ \\_\\  \\ \\_\\ \\_\\   /\\_____\\  \\ \\_____\\          \\ \\/ / /                            \n");
-  printf("  \\/_/  \\/_/   \\/_/\\/_/   \\/_____/   \\/_____/           \\/_/_/                  \n");
-  printf(ANSI_COLOR_RESET);
-}
-
-void imprimelento(char *p, int N)
-{
-  int i;
-  for (i = 0; *(p + i) != '\0'; i++)
-  {
-    printf("%c", *(p + i));
-    fflush(stdout);
-    Sleep(N);
-  }
-}
-
-/*TipoGrafo grafo;
-  int numVertices, numArestas, i, j, v1, v2, peso;
-  TipoValorVertice *v1_ptr, *v2_ptr;
-  TipoPeso *peso_ptr;
-
-  FILE *arquivo = fopen("ranking.txt", "rw");
-
-  if (arquivo == NULL) {
-
-    printf("Erro ao abrir o arquivo.\n");
-
-    return 1;
-  }
-  printf("Digite o n√∫mero de v√©rtices do grafo: ");
-  scanf("%d", &numVertices);
-  printf("Digite o n√∫mero de arestas do grafo: ");
-  scanf("%d", &numArestas);
-
-  grafo.numVertices = numVertices; // Set the number of vertices
-
-  FGVazio(&grafo);
-
-  for (i = 0; i < numArestas; i++) {
-    printf("Digite as extremidades da aresta %d: ", i + 1);
-    scanf("%d %d", &v1, &v2);
-    printf("Digite o peso da aresta %d: ", i + 1);
-    scanf("%d", &peso);
-    v1_ptr = &v1;
-    v2_ptr = &v2;
-    peso_ptr = &peso;
-    InsereAresta(v1_ptr, v2_ptr, peso_ptr, &grafo);
-  }
-
-  printf("Grafo:\n");
-  ImprimeGrafo(&grafo);
-
-  fclose(arquivo);
-  return 0;
-  */ 
-     
-       
-        
-
-
-
