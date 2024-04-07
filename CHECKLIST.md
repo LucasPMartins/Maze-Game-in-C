@@ -1,34 +1,34 @@
  ## Tarefas
 
-- [ ] Áreas
-   - [ ] Função de percorrer o grafo
-   - [ ] Desenhar os labirintos 
-   - [ ] Função de imprimir o grafo
-   - [ ] Função de verificar se o vértice tem descendentes e encerrar
-   - [ ] Função de verificar se é a saída do labirinto
-   - [ ] Função de calcular o tempo
+- [x] Áreas
+   - [x] Função de percorrer o grafo
+   - [x] Desenhar os labirintos 
+   - [x] Função de imprimir o grafo
+   - [x] Função de verificar se o vértice tem descendentes e encerrar
+   - [x] Função de verificar se é a saída do labirinto
+   - [x] Função de calcular o tempo
 
-- [ ] Área Central
-   - [ ] Sistema de pontuação
-   - [ ] Desenhar a área central
-   - [ ] Função que verifica se a pessoa tem pontos para continuar
-   - [ ] Função de percorrer o grafo ponderado
+- [x] Área Central
+   - [x] Sistema de pontuação
+   - [x] Desenhar a área central
+   - [x] Função que verifica se a pessoa tem pontos para continuar
+   - [x] Função de percorrer o grafo ponderado
 
-- [ ] Mapa
-   - [ ] Criar árvore binária
-   - [ ] Criar TAD árvore binária
-   - [ ] Desenhar a árvore
-   - [ ] Função para percorrer a árvore
-   - [ ] Função para imprimir os caminhos
+- [x] Mapa
+   - [x] Criar árvore binária
+   - [x] Criar TAD árvore binária
+   - [x] Desenhar a árvore
+   - [x] Função para percorrer a árvore
+   - [x] Função para imprimir os caminhos
 
-- [ ] Ranking
+- [x] Ranking
     - [x] Ordenar o ranking
     - [x] Criar TAD ranking
     - [x] Limpar histórico
     - [x] Apagar pontuações isoladas
-    - [ ] exibir por tempo total ou pontuação
+    - [x] exibir por tempo total ou pontuação
      
- - [ ] Menu
-     - [ ] Iniciar com a dificuldade escolhida
-     - [ ] Exibir ranking
-     - [ ] Sobre
+ - [x] Menu
+     - [x] Iniciar com a dificuldade escolhida
+     - [x] Exibir ranking
+     - [x] Sobre
