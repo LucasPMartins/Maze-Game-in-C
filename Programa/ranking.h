@@ -9,6 +9,7 @@
 typedef struct {
   char nome[25];
   double tempoTotal;
+  double tempoAreaCentral;
   int pontos;
   int fasesCompletas;
 } Jogador;
@@ -23,7 +24,7 @@ void inicializaRanking(Ranking *ranking);
 void insertionSort(Ranking *ranking, int tipo);
 
 void adicionaJogador(Ranking *ranking, char *nome, double tempoTotal,
-                     int pontos);
+                     int pontos, double tempoAreaCentral);
 
 void exibeRanking(const Ranking *ranking, int tipo);
 

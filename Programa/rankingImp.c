@@ -12,7 +12,7 @@ void insertionSort(Ranking *ranking, int tipo) {
       key = ranking->jogadores[i];
       j = i - 1;
 
-      while (j >= 0 && ranking->jogadores[j].tempoTotal < key.tempoTotal) {
+      while (j >= 0 && ranking->jogadores[j].tempoAreaCentral < key.tempoAreaCentral) {
         ranking->jogadores[j + 1] = ranking->jogadores[j];
         j = j - 1;
       }
@@ -35,13 +35,14 @@ void insertionSort(Ranking *ranking, int tipo) {
 }
 
 void adicionaJogador(Ranking *ranking, char *nome, double tempoTotal,
-                     int pontos) {
+                     int pontos,double tempoAreaCentral) {
   if (ranking->numJogadores < MAX_JOGADORES) {
     strncpy(ranking->jogadores[ranking->numJogadores].nome, nome,
             sizeof(ranking->jogadores[0].nome) - 1);
     ranking->jogadores[ranking->numJogadores]
         .nome[sizeof(ranking->jogadores[0].nome) - 1] = '\0';
     ranking->jogadores[ranking->numJogadores].tempoTotal = tempoTotal;
+    ranking->jogadores[ranking->numJogadores].tempoAreaCentral = tempoAreaCentral;
     ranking->jogadores[ranking->numJogadores].pontos = pontos;
     ranking->numJogadores++;
     insertionSort(ranking, 1);
@@ -54,6 +55,7 @@ void adicionaJogador(Ranking *ranking, char *nome, double tempoTotal,
       ranking->jogadores[MAX_JOGADORES - 1]
           .nome[sizeof(ranking->jogadores[0].nome) - 1] = '\0';
       ranking->jogadores[MAX_JOGADORES - 1].tempoTotal = tempoTotal;
+      ranking->jogadores[ranking->numJogadores].tempoAreaCentral = tempoAreaCentral;
       ranking->jogadores[MAX_JOGADORES - 1].pontos = pontos;
       insertionSort(ranking, 1);
     }
@@ -63,13 +65,13 @@ void adicionaJogador(Ranking *ranking, char *nome, double tempoTotal,
 void exibeRanking(const Ranking *ranking, int tipo) {
   if (tipo == 1) {
     for (int i = 0; i < ranking->numJogadores; i++) {
-      printf("                     %d. %s - Tempo Total: %.2f\n", i + 1,
-             ranking->jogadores[i].nome, ranking->jogadores[i].tempoTotal);
+      printf("               %d. %s - Tempo na Area Central: %.2f - Tempo Total: %.2f\n", i + 1,
+             ranking->jogadores[i].nome, ranking->jogadores[i].tempoAreaCentral, ranking->jogadores[i].tempoTotal);
     }
   } else if (tipo == 2) {
     for (int i = 0; i < ranking->numJogadores; i++) {
-      printf("                       %d. %s - Pontuacao: %d\n", i + 1,
-             ranking->jogadores[i].nome, ranking->jogadores[i].pontos);
+      printf("               %d. %s - Pontuacao: %d - Tempo Total: %.2f\n", i + 1,
+             ranking->jogadores[i].nome, ranking->jogadores[i].pontos, ranking->jogadores[i].tempoTotal);
     }
   }
 }
@@ -82,8 +84,8 @@ void salvarRanking(const Ranking *ranking) {
   }
 
   for (int i = 0; i < ranking->numJogadores; i++) {
-    fprintf(arquivo, "%s,%d,%.2f\n", ranking->jogadores[i].nome,
-            ranking->jogadores[i].pontos, ranking->jogadores[i].tempoTotal);
+    fprintf(arquivo, "%s,%d,%.2f,%.2f\n", ranking->jogadores[i].nome,
+            ranking->jogadores[i].pontos, ranking->jogadores[i].tempoTotal,ranking->jogadores[i].tempoAreaCentral);
   }
 
   fclose(arquivo);
@@ -101,8 +103,8 @@ void carregarRanking(Ranking *ranking) {
 
   while (!feof(arquivo)) {
     Jogador jogador;
-    if (fscanf(arquivo, "%24[^,],%d,%lf\n", jogador.nome, &jogador.pontos,
-               &jogador.tempoTotal) == 3) {
+    if (fscanf(arquivo, "%24[^,],%d,%lf,%lf\n", jogador.nome, &jogador.pontos,
+               &jogador.tempoTotal,&jogador.tempoAreaCentral) == 4) {
       if (ranking->numJogadores < MAX_JOGADORES) {
         ranking->jogadores[ranking->numJogadores++] = jogador;
       }

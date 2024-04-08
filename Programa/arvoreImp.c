@@ -110,7 +110,7 @@ void percorrerPosOrdemAux(NoArvore *no) {
 }
 
 void percorrerPosOrdem(ArvoreBinaria *arvore) {
-  printf("Arvore em pos-ordem (o ultimo È a raiz):\n");
+  printf("Arvore em pos-ordem (o ultimo eh a raiz):\n");
   percorrerPosOrdemAux(arvore->raiz);
 }
 

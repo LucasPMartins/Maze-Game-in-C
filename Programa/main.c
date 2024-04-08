@@ -30,7 +30,8 @@ void imprimelento(char *p, int N) {
   }
 }
 
-Jogador iniciarJogo() {
+Jogador iniciarJogo(double *tempoAreaCentral) {
+  struct timeval inicio, fim;
   ArvoreBinaria arvore = criarArvore();
   TipoGrafo grafo1, grafo2, grafo3, areaCentral;
   grafo1.numVertices = 3;
@@ -85,13 +86,17 @@ Jogador iniciarJogo() {
   // Remove o caractere de nova linha, se presente
   jogador.nome[strcspn(jogador.nome, "\n")] = 0;
   printf("Bem-vindo, %s!\n", jogador.nome);
+  gettimeofday(&inicio, NULL);
   iniciarJogoComPosOrdem(&arvore, &jogador);
+  gettimeofday(&fim, NULL);
+  *tempoAreaCentral = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
   liberarArvore(&arvore);
   return jogador;
 }
 
 int main() {
   struct timeval inicio, fim;
+  double tempoAreaCentral;
   double tempo_total;
   int op;
   Ranking *ranking = (Ranking *)malloc(sizeof(Ranking));
@@ -115,16 +120,17 @@ int main() {
       printf("\nIniciando o jogo...\n");
       gettimeofday(&inicio, NULL);
       Jogador jogador =
-          iniciarJogo(); // Essa função precisa ser ajustada conforme descrito
+          iniciarJogo(&tempoAreaCentral); // Essa função precisa ser ajustada conforme descrito
       gettimeofday(&fim, NULL);
       tempo_total = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
       printf("Tempo total de jogo: %.2f segundos\n", tempo_total);
       jogador.tempoTotal = tempo_total;
+      jogador.tempoAreaCentral = tempoAreaCentral;
       printf("\nRetornando ao menu principal...\n");
 
       // Adiciona o jogador ao ranking
       adicionaJogador(ranking, jogador.nome, jogador.tempoTotal,
-                      jogador.pontos);
+                      jogador.pontos,jogador.tempoAreaCentral);
       printf("Resultado adicionado ao ranking.\n");
 
       // Salva o ranking atualizado
@@ -134,14 +140,14 @@ int main() {
     case 2:
       print_logo();
       printf("\n                         --===  RANKING  ===--\n\n");
-      printf("                      1 - RANKING POR TEMPO TOTAL\n");
+      printf("                   1 - RANKING POR TEMPO NA AREA CENTRAL\n");
       printf("                      2 - RANKING POR PONTUACAO\n\n");
       printf("                          Digite sua Opcao:");
       scanf("%d", &op);
       if (op == 1) {
 
         print_logo();
-        printf("\n                 --===  RANKING POR TEMPO TOTAL  ===--\n\n");
+        printf("\n                 --===  RANKING POR TEMPO NA AREA CENTRAL  ===--\n\n");
         insertionSort(ranking, 1);
         exibeRanking(ranking, 1);
       } else if (op == 2) {
