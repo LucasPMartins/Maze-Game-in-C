@@ -9,7 +9,7 @@
 
 ## 🤝 Contributors
 [![LucasPMartins](https://github.com/LucasPMartins.png?size=60)](https://github.com/LucasPMartins "LucasPMartins on GitHub")
-[![pedrootrevisan](https://github.com/pedrootrevisan.png?size=60)](https://github.com/pedrootrevisan?tab=following"Pedro Trevisan on GitHub")
+[![pedrootrevisan](https://github.com/pedrootrevisan.png?size=60)](https://github.com/pedrootrevisan "Pedro Trevisan on GitHub")
 [![CaueGrassi7](https://github.com/CaueGrassi7.png?size=60)](https://github.com/CaueGrassi7 "CaueGrassi7 on GitHub")
 
 ## 🛠 Tools:
