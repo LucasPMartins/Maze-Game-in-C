@@ -1,11 +1,30 @@
 
-<img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=bc121c&height=120&section=header"/>
+<img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=03800b&height=120&section=header"/>
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=bc121c&size=45&center=true&vCenter=true&width=1000&lines=Powerful+Machine+\(TCD\)+)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=03800b&size=45&center=true&vCenter=true&width=1000&lines=Central+Maze)](https://git.io/typing-svg)
 
 ## ❔ About
 
+**Central Maze** is a maze game created in the **C** language for a course completion project **(Algorithms and Data Structures 2)**.
 
+### Code Organization and Data Structures:
+The code is organized and modularized using Abstract Data Types (ADTs) to facilitate maintenance and new implementations. Efficient data structures are employed in its development. The application includes the ADTs: tree, graph, and ranking.
+
+The program uses the Graph data structure in adjacency list format to represent the mazes, allowing users to navigate between vertices to reach an "exit" vertex while avoiding sinkholes.
+
+### **Game Features**:
+
+The game comprises two types of areas: common and central. The difference lies in their data structure, with the common area being an unweighted graph, while the central area is weighted.
+In terms of gameplay, the central area allows users to return using their acquired points, whereas in the common area, reaching a sinkhole results in an instant loss.
+Data Structure Usage:
+The Tree data structure is used as a map for the graphs (mazes), ensuring that the central area is visited last. The game progresses through traversing the tree nodes, each representing a graph.
+
+The program employs a player structure to store user information. This structure includes the player's name, number of completed levels, accumulated points, and playtime. These data are later used in the ranking system.
+
+### **Ranking and Sorting**:
+The program uses a file to create a ranking, storing the top 10 positions sorted either by points or by the longest time spent in the Central Area. The ranking is organized using the Insertion Sort algorithm, efficiently sorting players in descending order based on the chosen criteria (time or points). This ensures that players with higher scores or times occupy higher positions in the ranking.
+
+The progressive increase in the number of rooms (nodes) in each new area (level) adds complexity to the game incrementally. This can be visualized as a graph expansion, where each new level adds an additional node compared to the previous one. As depicted in the diagram, each node that increases complexity does so geometrically.
 
 ## 🤝 Contributors
 [![LucasPMartins](https://github.com/LucasPMartins.png?size=60)](https://github.com/LucasPMartins "LucasPMartins on GitHub")
@@ -24,13 +43,8 @@
 
 
 <p align="center">
-<img src="https://github.com/brenimcode/AED1/assets/127551374/567024a9-6ae2-4c59-8799-9acbcc321857)" />
+<img src="" />
 </p>
 
-<img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=bc121c&height=120&section=footer"/>
+<img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=03800b&height=120&section=footer"/>
 
-# Labirinto-AED2
-- Trabalho final da disciplina de Algoritmo e Estruturas de Dados 2 com o objetivo de reforçar o conhecimento com relação aos algoritmos para modelagem de problemas de grafos, árvores binárias e ordenação
-- Linguagem C
-- Repositório no Replit: https://replit.com/@cauegrassi7/Labirinto-AED2
-- Participantes: Cauê Grassi, Lucas Martins e Pedro Trevisan
