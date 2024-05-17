@@ -1,216 +1,499 @@
 #include "arvore.h"
 #include "grafos.h"
 #include "ranking.h"
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
-#include <time.h> // Para a função sleep_ms
+#include <stdlib.h>
+#include <time.h>
+#include <conio.h>
+#include <windows.h> //sleep
+
+#define ANSI_COLOR_RED "\x1b[31m" // coloca cor nos textos
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_RESET "\x1b[0m" // cor padrao
+
+void print_logo();
+void printMenuJogar(Jogador *ranking, int *numJogadores);
+void printRanking(Jogador *ranking, int numJogadores);
+void printSobre();
+
+void imprimelento(char *p, int N);
+
+int main()
+{
+    char *menuOptions[] = {" J O G A R\n", " R A N K I N G\n", " S O B R E\n", " S A I R\n"};
+    int numOptions = sizeof(menuOptions) / sizeof(menuOptions[0]);
+    int selectedIndex = 0, sair = 0;
+    char input;
+
+    Jogador *jogadores = (Jogador *)malloc(sizeof(Jogador));
+    Jogador *jogador = malloc(sizeof(Jogador));
+    int numJogadores = 0;
+
+    jogadores = lerRanking("ranking.txt", &numJogadores);
+
+    int i;
+    do
+    {
+        print_logo();
+        printf("\nSelecione um OPCAO:\n\n");
+        // Imprime as opções com a seleção indicada
+        for (int i = 0; i < numOptions; i++)
+        {
+            if (selectedIndex == i)
+            {
+                if (selectedIndex == 0)
+                {
+                    printf(ANSI_COLOR_GREEN);
+                    printf("   %s\n", menuOptions[i]);
+                    printf(ANSI_COLOR_RESET);
+                }
+                else
+                {
+                    printf(ANSI_COLOR_GREEN);
+                    printf("\n   %s\n", menuOptions[i]);
+                    printf(ANSI_COLOR_RESET);
+                }
+            }
+            else
+            {
+                printf("%s", menuOptions[i]);
+            }
+        }
+
+        // Lê a tecla pressionada
+        input = getch();
+
+        // Atualiza a seleção com base na tecla pressionada
+        switch (input)
+        {
+        case 'w':
+        case 'W':
+        case 72: // Código ASCII para seta para cima
+            selectedIndex = (selectedIndex - 1 + numOptions) % numOptions;
+            break;
+        case 's':
+        case 'S':
+        case 80: // Código ASCII para seta para baixo
+            selectedIndex = (selectedIndex + 1) % numOptions;
+            break;
+        case 13:                                 // Código ASCII para tecla Enter
+            if (selectedIndex == numOptions - 1) // SAIR
+            {
+                printf(ANSI_COLOR_YELLOW);
+                printf("Saindo do jogo");
+                i = 3;
+                while (i > 0)
+                {
+                    imprimelento("...", 250);
+                    printf("\b\b\b   \b\b\b");
+                    i--;
+                }
+                printf("\n\n");
+                printf(ANSI_COLOR_RESET);
+                sair = 1; // Define a variável para sair do menu
+            }
+            else
+            {
+                if (selectedIndex == 0) // JOGAR
+                {
+                    printMenuJogar(jogadores, &numJogadores);
+                }
+                else if (selectedIndex == 1) // RANKING
+                {
+                    printRanking(jogadores, numJogadores);
+                }
+                if (selectedIndex == 2) // SOBRE
+                {
+                    printSobre();
+                }
+            }
+            break;
+        default:
+            break;
+        }
+    } while (sair != 1); // Loop até que a opção "Sair" seja selecionada
+    salvarRanking("ranking.txt", jogadores, numJogadores);
+    //  Liberar a memória alocada para o vetor de jogadores
+    free(jogadores);
+    free(jogador);
+    return 0;
+}
 
 void print_logo()
 {
-  printf(" ______     ______     __   __     ______   ______     ______     __ \n");      
-  printf("/\\  ___\\   /\\  ___\\   /\\ \"-.\\ \\   /\\__  _\\ /\\  == \\   /\\  __ \\   /\\ \\      \n");
-  printf("\\ \\ \\____  \\ \\  __\\   \\ \\ \\-.  \\  \\/_/\\ \\/ \\ \\  __<   \\ \\  __ \\  \\ \\ \\____ \n");
-  printf(" \\ \\_____\\  \\ \\_____\\  \\ \\_\\ \"\\_\\    \\ \\_\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\  \\ \\_____\\ \n");
-  printf("  \\/_____/   \\/_____/   \\/_/ \\/_/     \\/_/   \\/_/ /_/   \\/_/\\/_/   \\/_____/ \n");
-  printf("                                                                \n");
-  printf(" __    __     ______     ______     ______               ____             \n");
-  printf("/\\ \"-./  \\   /\\  __ \\   /\\___  \\   /\\  ___\\             /\\___\\                     \n");
-  printf("\\ \\ \\-./\\ \\  \\ \\  __ \\  \\/_/  /__  \\ \\  __\\            /\\ \\___\\                        \n");
-  printf(" \\ \\_\\ \\ \\_\\  \\ \\_\\ \\_\\   /\\_____\\  \\ \\_____\\          \\ \\/ / /                            \n");
-  printf("  \\/_/  \\/_/   \\/_/\\/_/   \\/_____/   \\/_____/           \\/_/_/                  \n");
+
+    system("cls");
+    printf(ANSI_COLOR_GREEN);
+    printf(" ______  ______  __   __  ______  ______  ______  __       \n");
+    printf("/\\  ___\\/\\  ___\\/\\ \"-.\\ \\/\\__  _\\/\\  == \\/\\  __ \\/\\ \\      \n");
+    printf("\\ \\ \\___\\ \\  __\\\\ \\ \\-.  \\/_/\\ \\/\\ \\  __<\\ \\  __ \\ \\ \\____ \n");
+    printf(" \\ \\_____\\ \\_____\\ \\_\\\\\"\\_\\ \\ \\_\\ \\ \\_\\ \\_\\ \\_\\ \\_\\ \\_____\\ \n");
+    printf("  \\/_____/\\/_____/\\/_/ \\/_/  \\/_/  \\/_/ /_/\\/_/\\/_/\\/_____/ \n");
+    // printf("                                                                \n");
+    printf(" __    __  ______  ______  ______             ____             \n");
+    printf("/\\ \"-./  \\/\\  __ \\/\\___  \\/\\  ___\\           /\\___\\                     \n");
+    printf("\\ \\ \\-./\\ \\ \\  __ \\/_/  /_\\ \\  __\\          /\\ \\___\\                        \n");
+    printf(" \\ \\_\\ \\ \\_\\ \\_\\ \\_\\/\\_____\\ \\_____\\        \\ \\/ / /                            \n");
+    printf("  \\/_/  \\/_/\\/_/\\/_/\\/_____/\\/_____/         \\/_/_/                  \n\n");
+    printf(ANSI_COLOR_RESET);
 }
 
-
-void imprimelento(char *p, int N) {
-  for (int i = 0; *(p + i) != '\0'; i++) {
-    printf("%c", *(p + i));
-    fflush(stdout);
-  }
-}
-
-Jogador iniciarJogo(double *tempoAreaCentral) {
-  struct timeval inicio, fim;
-  ArvoreBinaria arvore = criarArvore();
-  TipoGrafo grafo1, grafo2, grafo3, areaCentral;
-  grafo1.numVertices = 3;
-  grafo2.numVertices = 4;
-  grafo3.numVertices = 5;
-  areaCentral.numVertices = 7;
-
-  FGVazio(&grafo1);
-  FGVazio(&grafo2);
-  FGVazio(&grafo3);
-  FGVazio(&areaCentral);
-
-  // Conexões do Grafo 1
-  InsereAresta(0, 1, 0, &grafo1, 0, 0); // Aresta normal
-  InsereAresta(1, 2, 0, &grafo1, 1, 0); // Aresta para saída
-  InsereAresta(2, 0, 0, &grafo1, 0, 1); // Aresta para sumidouro
-
-  // Conexões do Grafo 2
-  InsereAresta(0, 1, 0, &grafo2, 0, 0); // Aresta normal
-  InsereAresta(1, 2, 0, &grafo2, 0, 0); // Aresta normal
-  InsereAresta(2, 3, 0, &grafo2, 1, 0); // Aresta para saída
-  InsereAresta(3, 1, 0, &grafo2, 0, 1); // Aresta para sumidouro
-
-  // Conexões do Grafo 3 (grafo raiz)
-  InsereAresta(0, 1, 0, &grafo3, 0, 0); // Aresta ponderada
-  InsereAresta(1, 2, 0, &grafo3, 0, 0); // Aresta ponderada
-  InsereAresta(2, 3, 0, &grafo3, 1, 0); // Aresta ponderada para saída
-  InsereAresta(3, 4, 0, &grafo3, 0, 1); // Aresta ponderada para sumidouro
-  InsereAresta(4, 0, 0, &grafo3, 0,
-               0); // Aresta ponderada de volta ao início (opcional)
-
-  // Adicionando arestas à área central
-  InsereAresta(0, 1, 5, &areaCentral, 0, 0); // Aresta ponderada comum
-  InsereAresta(1, 2, 3, &areaCentral, 0, 1); // Sumidouro no vértice 2 com peso
-  InsereAresta(1, 3, 2, &areaCentral, 1, 0); // Saída no vértice 3 com peso
-  InsereAresta(2, 4, 1, &areaCentral, 0, 1);
-  InsereAresta(2, 2, 1, &areaCentral, 0, 0);
-
-  // Inserindo os grafos na árvore
-  inserir(&arvore, grafo1, 0);
-  inserir(&arvore, grafo2, 0);
-  inserir(&arvore, grafo3, 0);
-  inserir(&arvore, areaCentral, 1);
-
-  // Iniciando o jogo percorrendo a árvore em pós-ordem e jogando cada fase
-  Jogador jogador;
-  jogador.pontos = 0;
-  jogador.tempoTotal = 0;
-  jogador.fasesCompletas = 0;
-  printf("Entre com o nome do jogador: ");
-  fgets(jogador.nome, sizeof(jogador.nome), stdin);
-  // Remove o caractere de nova linha, se presente
-  jogador.nome[strcspn(jogador.nome, "\n")] = 0;
-  printf("Bem-vindo, %s!\n", jogador.nome);
-  gettimeofday(&inicio, NULL);
-  iniciarJogoComPosOrdem(&arvore, &jogador);
-  gettimeofday(&fim, NULL);
-  *tempoAreaCentral = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
-  liberarArvore(&arvore);
-  return jogador;
-}
-
-int main() {
-  struct timeval inicio, fim;
-  double tempoAreaCentral;
-  double tempo_total;
-  int op;
-  Ranking *ranking = (Ranking *)malloc(sizeof(Ranking));
-
-  carregarRanking(ranking);
-
-  do {
-
-    print_logo();
-    printf("\n                           1 - JOGAR\n");
-    printf("                           2 - RANKING\n");
-    printf("                           3 - SOBRE\n");
-    printf("                           0 - SAIR\n\n");
-    printf("                       Digite sua Opcao: ");
-    scanf("%d", &op);
-    getchar();
-
-    switch (op) {
-    case 1:
-      print_logo();
-      printf("\nIniciando o jogo...\n");
-      gettimeofday(&inicio, NULL);
-      Jogador jogador =
-          iniciarJogo(&tempoAreaCentral); // Essa função precisa ser ajustada conforme descrito
-      gettimeofday(&fim, NULL);
-      tempo_total = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
-      printf("Tempo total de jogo: %.2f segundos\n", tempo_total);
-      jogador.tempoTotal = tempo_total;
-      jogador.tempoAreaCentral = tempoAreaCentral;
-      printf("\nRetornando ao menu principal...\n");
-
-      // Adiciona o jogador ao ranking
-      adicionaJogador(ranking, jogador.nome, jogador.tempoTotal,
-                      jogador.pontos,jogador.tempoAreaCentral);
-      printf("Resultado adicionado ao ranking.\n");
-
-      // Salva o ranking atualizado
-      salvarRanking(ranking);
-      printf("Ranking atualizado salvo com sucesso.\n");
-      break;
-    case 2:
-      print_logo();
-      printf("\n                         --===  RANKING  ===--\n\n");
-      printf("                   1 - RANKING POR TEMPO NA AREA CENTRAL\n");
-      printf("                      2 - RANKING POR PONTUACAO\n\n");
-      printf("                          Digite sua Opcao:");
-      scanf("%d", &op);
-      if (op == 1) {
-
-        print_logo();
-        printf("\n                 --===  RANKING POR TEMPO NA AREA CENTRAL  ===--\n\n");
-        insertionSort(ranking, 1);
-        exibeRanking(ranking, 1);
-      } else if (op == 2) {
-        print_logo();
-        printf("\n                  --===  RANKING POR PONTUACAO  ===--\n\n");
-        insertionSort(ranking, 2);
-        exibeRanking(ranking, 2);
-      } else {
-        printf("\n                            OPCAO INVALIDA!\n");
-      }
-      printf("\n                     Pressione \"Enter\" para voltar...");
-      while (getchar() != '\n')
-        ;
-      op = 4;
-      break;
-    case 3:
-      print_logo();
-      printf("\n(!) SOBRE:\n");
-      printf("O jogo eh um labirinto interativo onde o jogador deve navegar "
-             "por diferentes\n");
-      printf("areas, utilizando conceitos de  Grafos, Arvores Binarias e "
-             "Ordenacao. Proje-\n");
-      printf("to feito para um  trabalho de conclusao de disciplina (Algoritmo "
-             "e Estrutura\n");
-      printf("de Dados 2).\n");
-      printf("Criado por: Lucas Martins, Caue Grassi e Pedro Trevisan\n");
-      printf("\n(?) COMO JOGAR:\n");
-      printf("1 - Areas do Labirinto: ");
-      printf("O jogador  interage  diretamente escolhendo caminhos\n");
-      printf("para sair do labirinto. Se escolher  um caminho sem saida, volta "
-             "a sala ini-\n");
-      printf("cial (derrota). Encontrar a saida leva a uma nova area (avanco "
-             "de fase).\n");
-      printf("2 - Area  Central:  ");
-      printf("Sala especial com pontuacao para avancos. Permite ao jo-\n");
-      printf("gador retroceder uma sala,sacrificando pontos. A derrota ocorre "
-             "se encontrar\n");
-      printf("uma sala sem saida e o jogador estiver sem pontos.\n");
-      printf("3 - Dificuldade Progressiva: ");
-      printf("O numero de salas aumenta a cada fase, tornando\n");
-      printf("o percurso mais dificil.\n");
-      printf("4 - Mapa do Labirinto: ");
-      printf("Caminhos levam  a Area Central. O  progresso eh feito\n");
-      printf("completando areas sucessivas. Todas  as areas  levam a Area "
-             "Central.\n");
-      printf("5 - Sistema de Ranking: ");
-      printf("Baseado no tempo e na pontuacao na Area Central.\n");
-      printf("Armazena as ultimas 10 vitorias, classificando os jogadores  por "
-             "nome, tempo\n");
-      printf("total, tempo por area e pontuacao.\n");
-      printf("\nPressione \"Enter\" para voltar...");
-      while (getchar() != '\n')
-        ;
-      break;
-    case 0:
-      printf("Saindo do jogo...\n");
-
-      break;
-    default:
-      printf("\nOpcao invalida!\n");
+void imprimelento(char *p, int N)
+{
+    int i;
+    for (i = 0; *(p + i) != '\0'; i++)
+    {
+        printf("%c", *(p + i));
+        fflush(stdout);
+        Sleep(N);
     }
-  } while (op != 0);
+}
 
-  free(ranking);
-  return 0;
+void printSobre()
+{
+    char tecla;
+    while (1)
+    {
+        if (_kbhit())
+        {
+            tecla = _getch();
+            print_logo();
+            printf(ANSI_COLOR_GREEN);
+            printf("-------==================< S O B R E >=================------\n\n");
+            printf("(!) SOBRE:\n");
+            printf(ANSI_COLOR_RESET);
+            printf("O jogo eh um labirinto interativo onde o jogador deve navegar\n");
+            printf("por diferentes areas, utilizando conceitos de Grafos, Arvores\n");
+            printf("Binarias e Ordenacao. Projeto feito para um  trabalho de con-\n");
+            printf("clusao de disciplina (Algoritmo e Estrutura de Dados 2).\n\n");
+            printf("Criado por: Lucas Martins, Caue Grassi e Pedro Trevisan\n");
+            printf(ANSI_COLOR_GREEN);
+            printf("\n(?) COMO JOGAR:\n");
+            printf("1 - Areas do Labirinto:");
+            printf(ANSI_COLOR_RESET);
+            printf(" O jogador interage diretamente esco-\n");
+            printf("lhendo caminhos para sair do labirinto. Se escolher  um cami-\n");
+            printf("nho sem saida, volta a sala inicial (derrota). Encontrar a \n");
+            printf("saida leva a uma nova area (avanco de fase).\n");
+            printf(ANSI_COLOR_GREEN);
+            printf("2 - Area  Central: ");
+            printf(ANSI_COLOR_RESET);
+            printf("Sala especial com pontuacao para avancos.\n");
+            printf("Permite ao jogador retroceder uma sala, sacrificando pontos.\n");
+            printf("A derrota ocorre se encontrar uma sala sem saida e o jogador\n");
+            printf("estiver sem pontos.\n");
+            printf(ANSI_COLOR_GREEN);
+            printf("3 - Dificuldade Progressiva: ");
+            printf(ANSI_COLOR_RESET);
+            printf("O numero de salas aumenta a ca-\n");
+            printf("da fase, tornando o percurso mais dificil.\n");
+            printf(ANSI_COLOR_GREEN);
+            printf("4 - Mapa do Labirinto: ");
+            printf(ANSI_COLOR_RESET);
+            printf("Caminhos levam  a Area Central.O pro-\n");
+            printf("gresso eh feito completando areas sucessivas. Todas as areas\n");
+            printf("levam a Area Central.\n");
+            printf(ANSI_COLOR_GREEN);
+            printf("5 - Sistema de Ranking: ");
+            printf(ANSI_COLOR_RESET);
+            printf("Baseado no tempo e na pontuacao na\n");
+            printf("Area Central. Armazena as ultimas 10 vitorias, classificando\n");
+            printf("os jogadores tempo por area e pontuacao.\n\n");
+            printf(ANSI_COLOR_GREEN);
+            printf("Pressione a tecla 'ESC' para SAIR...");
+            printf(ANSI_COLOR_RESET);
+            if (tecla == 27)
+            { // Verifica se a tecla pressionada é o código ASCII do "Esc"
+                break;
+            }
+        }
+    }
+}
+
+void printRanking(Jogador *jogadores, int numJogadores)
+{
+    char *menuOptions[] = {" RANKING POR PONTUACAO\n", " RANKING POR TEMPO\n", " VOLTAR\n"};
+    int numOptions = sizeof(menuOptions) / sizeof(menuOptions[0]);
+    int selectedIndex = 0, sair = 0;
+    char input;
+
+    int i;
+    do
+    {
+        print_logo();
+        printf(ANSI_COLOR_GREEN);
+        printf("------================< R A N K I N G >================------\n");
+        printf(ANSI_COLOR_RESET);
+        printf("\nSelecione um OPCAO:\n\n");
+        // Imprime as opções com a seleção indicada
+        for (int i = 0; i < numOptions; i++)
+        {
+            if (selectedIndex == i)
+            {
+                if (selectedIndex == 0)
+                {
+                    printf(ANSI_COLOR_GREEN);
+                    printf("   %s\n", menuOptions[i]);
+                    printf(ANSI_COLOR_RESET);
+                }
+                else
+                {
+                    printf(ANSI_COLOR_GREEN);
+                    printf("\n   %s\n", menuOptions[i]);
+                    printf(ANSI_COLOR_RESET);
+                }
+            }
+            else
+            {
+                printf("%s", menuOptions[i]);
+            }
+        }
+
+        // Lê a tecla pressionada
+        input = getch();
+
+        // Atualiza a seleção com base na tecla pressionada
+        switch (input)
+        {
+        case 'w':
+        case 'W':
+        case 72: // Código ASCII para seta para cima
+            selectedIndex = (selectedIndex - 1 + numOptions) % numOptions;
+            break;
+        case 's':
+        case 'S':
+        case 80: // Código ASCII para seta para baixo
+            selectedIndex = (selectedIndex + 1) % numOptions;
+            break;
+        case 13:                                 // Código ASCII para tecla Enter
+            if (selectedIndex == numOptions - 1) // SAIR
+            {
+                sair = 1; // Define a variável para sair do menu
+            }
+            else
+            {
+                if (selectedIndex == 0) // RANKING POR PONTUAÇÃO
+                {
+                    print_logo();
+                    printf(ANSI_COLOR_GREEN);
+                    printf("-----=============< RANKING POR PONTUACAO >=============-----\n\n");
+                    printf(ANSI_COLOR_RESET);
+                    insertionSort(jogadores, numJogadores, 2);
+                    exibeRanking(jogadores, numJogadores);
+                    printf(ANSI_COLOR_GREEN);
+                    system("pause");
+                    printf(ANSI_COLOR_RESET);
+                }
+                else if (selectedIndex == 1) // RANKING POR TEMPO
+                {
+                    print_logo();
+                    printf(ANSI_COLOR_GREEN);
+                    printf("-----===============< RANKING POR TEMPO >===============-----\n\n");
+                    printf(ANSI_COLOR_RESET);
+                    insertionSort(jogadores, numJogadores, 1);
+                    exibeRanking(jogadores, numJogadores);
+                    printf(ANSI_COLOR_GREEN);
+                    system("pause");
+                    printf(ANSI_COLOR_RESET);
+                }
+            }
+            break;
+        default:
+            break;
+        }
+    } while (sair != 1); // Loop até que a opção "Sair" seja selecionada
+}
+
+void printMenuJogar(Jogador *jogadores, int *numJogadores)
+{
+    char *menuOptions[] = {" L O G I N\n", " C A D A S T R A R\n", " V O L T A R\n"};
+    int numOptions = sizeof(menuOptions) / sizeof(menuOptions[0]);
+    int selectedIndex = 0, sair = 0;
+    char input;
+
+    char nome[50], senha[10];
+    Jogador *jogador = malloc(sizeof(Jogador));
+
+    int i;
+    do
+    {
+        print_logo();
+        printf(ANSI_COLOR_GREEN);
+        printf("------==================< J O G A R >==================------\n");
+        printf(ANSI_COLOR_RESET);
+        printf("\nSelecione um OPCAO:\n\n");
+        // Imprime as opções com a seleção indicada
+        for (int i = 0; i < numOptions; i++)
+        {
+            if (selectedIndex == i)
+            {
+                if (selectedIndex == 0)
+                {
+                    printf(ANSI_COLOR_GREEN);
+                    printf("   %s\n", menuOptions[i]);
+                    printf(ANSI_COLOR_RESET);
+                }
+                else
+                {
+                    printf(ANSI_COLOR_GREEN);
+                    printf("\n   %s\n", menuOptions[i]);
+                    printf(ANSI_COLOR_RESET);
+                }
+            }
+            else
+            {
+                printf("%s", menuOptions[i]);
+            }
+        }
+
+        // Lê a tecla pressionada
+        input = getch();
+
+        // Atualiza a seleção com base na tecla pressionada
+        switch (input)
+        {
+        case 'w':
+        case 'W':
+        case 72: // Código ASCII para seta para cima
+            selectedIndex = (selectedIndex - 1 + numOptions) % numOptions;
+            break;
+        case 's':
+        case 'S':
+        case 80: // Código ASCII para seta para baixo
+            selectedIndex = (selectedIndex + 1) % numOptions;
+            break;
+        case 13:                                 // Código ASCII para tecla Enter
+            if (selectedIndex == numOptions - 1) // SAIR
+            {
+                sair = 1; // Define a variável para sair do menu
+            }
+            else
+            {
+                if (selectedIndex == 0) // JOGAR LOGIN
+                {
+                    print_logo();
+                    printf(ANSI_COLOR_GREEN);
+                    printf("-------=================< L O G I N >=================-------\n\n");
+                    printf(ANSI_COLOR_RESET);
+                    i = 3;
+                    do
+                    {
+                        printf("\nDigite seu nome: ");
+                        printf(ANSI_COLOR_YELLOW);
+                        setbuf(stdin, NULL);
+                        scanf("%s", &nome);
+                        printf(ANSI_COLOR_RESET);
+                        printf("\nDigite sua senha: ");
+                        printf(ANSI_COLOR_YELLOW);
+                        setbuf(stdin, NULL);
+                        scanf("%s", &senha);
+                        printf(ANSI_COLOR_RESET);
+                        senha[strcspn(senha, "\n")] = '\0';
+                        nome[strcspn(nome, "\n")] = '\0';
+                        jogador = retornaJogador(jogadores, *numJogadores, nome, senha);
+                        if (jogador == NULL) // Usuario não encontrado
+                        {
+                            printf(ANSI_COLOR_RED);
+                            printf("\nNome de Usuario ou Senha Invalidos! Tentativas: %d\n", i - 1);
+                            printf(ANSI_COLOR_RESET);
+                            i--;
+                        }
+                        else // Usuario encontrado e senha correta
+                        {
+                            break;
+                        }
+                    } while (i > 0); // Encontrou o jogador
+                    if (jogador != NULL)
+                    {
+                        printf(ANSI_COLOR_YELLOW);
+                        printf("\nCARREGANDO");
+                        i = 3;
+                        while (i > 0)
+                        {
+                            imprimelento("...", 250);
+                            printf("\b\b\b   \b\b\b");
+                            i--;
+                        }
+                        printf(ANSI_COLOR_RESET);
+                        iniciarJogo(jogador);
+                    }
+                    else
+                    {
+                        printf(ANSI_COLOR_RED);
+                        printf("\nJogador nao encontrado!\n");
+                        printf(ANSI_COLOR_RESET);
+                    }
+                }
+                else if (selectedIndex == 1) // JOGAR CADASTRO
+                {
+                    print_logo();
+                    printf(ANSI_COLOR_GREEN);
+                    printf("-----================< C A D A S T R O >================-----\n\n");
+                    printf(ANSI_COLOR_RESET);
+                    i = 3;
+                    do
+                    {
+                        printf("\nDigite seu nome: ");
+                        printf(ANSI_COLOR_YELLOW);
+                        setbuf(stdin, NULL);
+                        scanf("%s", &nome);
+                        printf(ANSI_COLOR_RESET);
+                        nome[strcspn(nome, "\n")] = '\0';
+                        jogador = retornaJogador(jogadores, *numJogadores, nome, NULL);
+                        if (jogador != NULL) // Existe um jogador com esse nome
+                        {
+                            printf(ANSI_COLOR_RED);
+                            printf("\nNome de Usuario em uso, tente usar outro! Tentativas: %d\n", i - 1);
+                            printf(ANSI_COLOR_RESET);
+                            i--;
+                        }
+                        else // Não existe um jogador com o nome digitado
+                        {
+                            printf("\nDigite sua senha: ");
+                            printf(ANSI_COLOR_YELLOW);
+                            setbuf(stdin, NULL);
+                            scanf("%s", &senha);
+                            printf(ANSI_COLOR_RESET);
+                            senha[strcspn(senha, "\n")] = '\0';
+                            // Aumentar o tamanho do vetor de jogadores
+                        }
+                    } while (i > 0);
+                    jogador = adicionarJogador(jogadores, &numJogadores, nome, senha);
+                    if (jogador != NULL) // Jogador criado com sucesso
+                    {
+                        printf(ANSI_COLOR_YELLOW);
+                        printf("\nSALVANDO");
+                        i = 3;
+                        while (i > 0)
+                        {
+                            imprimelento("...", 250);
+                            printf("\b\b\b   \b\b\b");
+                            i--;
+                        }
+                        printf(ANSI_COLOR_RESET);
+                        iniciarJogo(jogador);
+                    }
+                    else
+                    {
+                        printf(ANSI_COLOR_RED);
+                        printf("\nErro na criacao de usuario!\n");
+                        printf(ANSI_COLOR_RESET);
+                    }
+                }
+            }
+            break;
+        default:
+            break;
+        }
+    } while (sair != 1); // Loop até que a opção "Sair" seja selecionada
+}
+
+void iniciarJogo(Jogador *jogador)
+{
 }

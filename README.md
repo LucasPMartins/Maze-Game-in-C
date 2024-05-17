@@ -42,9 +42,5 @@ The progressive increase in the number of rooms (nodes) in each new area (level)
 ![C](https://img.shields.io/badge/c-0D1117?style=for-the-badge&logo=c&logoColor=0a58ee)
 
 
-<p align="center">
-<img src="" />
-</p>
-
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=03800b&height=120&section=footer"/>
 

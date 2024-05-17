@@ -2,135 +2,142 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void inicializaRanking(Ranking *ranking) { ranking->numJogadores = 0; }
+#define ANSI_COLOR_RED "\x1b[31m" // coloca cor nos textos
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_RESET "\x1b[0m" // cor padrao
 
-void insertionSort(Ranking *ranking, int tipo) {
+void insertionSort(Jogador *ranking, int numJogadores, int tipo)
+{
   int i, j;
   Jogador key;
-  if (tipo == 1) {
-    for (i = 1; i < ranking->numJogadores; i++) {
-      key = ranking->jogadores[i];
+  if (tipo == 1)
+  {
+    for (i = 1; i < numJogadores && i <= 10; i++)
+    {
+      key = ranking[i];
       j = i - 1;
 
-      while (j >= 0 && ranking->jogadores[j].tempoAreaCentral < key.tempoAreaCentral) {
-        ranking->jogadores[j + 1] = ranking->jogadores[j];
+      while (j >= 0 && ranking[j].tempoAreaCentral < key.tempoAreaCentral)
+      {
+        ranking[j + 1] = ranking[j];
         j = j - 1;
       }
-      ranking->jogadores[j + 1] = key;
+      ranking[j + 1] = key;
     }
-  } else if (tipo == 2) {
-    for (i = 1; i < ranking->numJogadores; i++) {
-      key = ranking->jogadores[i];
+  }
+  else if (tipo == 2)
+  {
+    for (i = 1; i < numJogadores && i <= 10; i++)
+    {
+      key = ranking[i];
       j = i - 1;
 
-      while (j >= 0 && ranking->jogadores[j].pontos < key.pontos) {
-        ranking->jogadores[j + 1] = ranking->jogadores[j];
+      while (j >= 0 && ranking[j].pontos < key.pontos)
+      {
+        ranking[j + 1] = ranking[j];
         j = j - 1;
       }
-      ranking->jogadores[j + 1] = key;
+      ranking[j + 1] = key;
     }
-  } else {
+  }
+  else
+  {
     printf("Erro na ordenacao!");
   }
 }
 
-void adicionaJogador(Ranking *ranking, char *nome, double tempoTotal,
-                     int pontos,double tempoAreaCentral) {
-  if (ranking->numJogadores < MAX_JOGADORES) {
-    strncpy(ranking->jogadores[ranking->numJogadores].nome, nome,
-            sizeof(ranking->jogadores[0].nome) - 1);
-    ranking->jogadores[ranking->numJogadores]
-        .nome[sizeof(ranking->jogadores[0].nome) - 1] = '\0';
-    ranking->jogadores[ranking->numJogadores].tempoTotal = tempoTotal;
-    ranking->jogadores[ranking->numJogadores].tempoAreaCentral = tempoAreaCentral;
-    ranking->jogadores[ranking->numJogadores].pontos = pontos;
-    ranking->numJogadores++;
-    insertionSort(ranking, 1);
-  } else {
-    // Se o novo jogador tem mais pontos que o último do ranking ordenado,
-    // substitui o último
-    if (pontos > ranking->jogadores[MAX_JOGADORES - 1].pontos) {
-      strncpy(ranking->jogadores[MAX_JOGADORES - 1].nome, nome,
-              sizeof(ranking->jogadores[0].nome) - 1);
-      ranking->jogadores[MAX_JOGADORES - 1]
-          .nome[sizeof(ranking->jogadores[0].nome) - 1] = '\0';
-      ranking->jogadores[MAX_JOGADORES - 1].tempoTotal = tempoTotal;
-      ranking->jogadores[ranking->numJogadores].tempoAreaCentral = tempoAreaCentral;
-      ranking->jogadores[MAX_JOGADORES - 1].pontos = pontos;
-      insertionSort(ranking, 1);
-    }
+void exibeRanking(Jogador *ranking, int numJogadores)
+{
+  printf("    NOME:     TEMPO TOTAL:   TEMPO AREA CENTRAL:   PONTUACAO:\n\n");
+  for (int i = 0; i < numJogadores && i < 10; i++)
+  {
+    printf("%d - %s\t     %.2f\t\t   %.2f\t\t   %d\n", i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
   }
+  printf("\n");
 }
 
-void exibeRanking(const Ranking *ranking, int tipo) {
-  if (tipo == 1) {
-    for (int i = 0; i < ranking->numJogadores; i++) {
-      printf("               %d. %s - Tempo na Area Central: %.2f - Tempo Total: %.2f\n", i + 1,
-             ranking->jogadores[i].nome, ranking->jogadores[i].tempoAreaCentral, ranking->jogadores[i].tempoTotal);
-    }
-  } else if (tipo == 2) {
-    for (int i = 0; i < ranking->numJogadores; i++) {
-      printf("               %d. %s - Pontuacao: %d - Tempo Total: %.2f\n", i + 1,
-             ranking->jogadores[i].nome, ranking->jogadores[i].pontos, ranking->jogadores[i].tempoTotal);
-    }
-  }
-}
-
-void salvarRanking(const Ranking *ranking) {
-  FILE *arquivo = fopen("ranking.txt", "w");
-  if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo de ranking para escrita.\n");
-    return;
+Jogador *lerRanking(const char *nomeArquivo, int *numJogadores)
+{
+  FILE *arquivo = fopen(nomeArquivo, "rb");
+  if (!arquivo)
+  {
+    perror("Erro ao abrir o arquivo");
+    exit(EXIT_FAILURE);
   }
 
-  for (int i = 0; i < ranking->numJogadores; i++) {
-    fprintf(arquivo, "%s,%d,%.2f,%.2f\n", ranking->jogadores[i].nome,
-            ranking->jogadores[i].pontos, ranking->jogadores[i].tempoTotal,ranking->jogadores[i].tempoAreaCentral);
+  // Obter o tamanho do arquivo
+  fseek(arquivo, 0, SEEK_END);
+  long tamanhoArquivo = ftell(arquivo);
+  rewind(arquivo);
+
+  // Calcular quantos jogadores existem no arquivo
+  *numJogadores = tamanhoArquivo / sizeof(Jogador);
+  // Alocar memória para o vetor de jogadores
+  Jogador *ranking = malloc(*numJogadores * sizeof(Jogador));
+  if (!ranking)
+  {
+    perror("Erro de alocação de memória");
+    exit(EXIT_FAILURE);
   }
+
+  // Ler os jogadores do arquivo para o vetor
+  fread(ranking, sizeof(Jogador), *numJogadores, arquivo);
 
   fclose(arquivo);
-  printf("\n\nRanking salvo com sucesso.\n");
+  return ranking;
 }
 
-void carregarRanking(Ranking *ranking) {
-  FILE *arquivo = fopen("ranking.txt", "r");
-  if (arquivo == NULL) {
-    printf("Erro ao abrir o arquivo de ranking para leitura.\n");
-    return;
+void salvarRanking(const char *nomeArquivo, Jogador *ranking, int numJogadores)
+{
+  FILE *arquivo = fopen(nomeArquivo, "wb");
+  if (!arquivo)
+  {
+    perror("Erro ao abrir o arquivo");
+    exit(EXIT_FAILURE);
   }
 
-  inicializaRanking(ranking); // Reinicia o ranking antes de carregar os dados
-
-  while (!feof(arquivo)) {
-    Jogador jogador;
-    if (fscanf(arquivo, "%24[^,],%d,%lf,%lf\n", jogador.nome, &jogador.pontos,
-               &jogador.tempoTotal,&jogador.tempoAreaCentral) == 4) {
-      if (ranking->numJogadores < MAX_JOGADORES) {
-        ranking->jogadores[ranking->numJogadores++] = jogador;
-      }
-    }
-  }
+  // Escrever os jogadores no arquivo
+  fwrite(ranking, sizeof(Jogador), numJogadores, arquivo);
 
   fclose(arquivo);
 }
 
-void limparRanking(Ranking *ranking) {
-  ranking->numJogadores = 0;
-  printf("O histórico do ranking foi limpo.\n");
-}
-
-void removerJogador(Ranking *ranking, char *nome) {
-  int i, j;
-  for (i = 0; i < ranking->numJogadores; i++) {
-    if (strcmp(ranking->jogadores[i].nome, nome) == 0) {
-      // Jogador encontrado, desloca todos os seguintes uma posição para trás
-      for (j = i; j < ranking->numJogadores - 1; j++) {
-        ranking->jogadores[j] = ranking->jogadores[j + 1];
+Jogador *retornaJogador(Jogador *jogadores, int numJogadores, char *nome, char *senha)
+{
+  for (int i = 0; i < numJogadores; i++)
+  {
+    if (senha == NULL) // Verifica somente o nome
+    {
+      if (strcmp(jogadores[i].nome, nome) == 0) // Se existir um nome igual não é possivel cria novo jogador
+      {
+        return &jogadores[i];
       }
-      ranking->numJogadores--; // Decrementa o número total de jogadores
-      printf("Jogador '%s' removido do ranking.\n", nome);
-      return;
+    }
+    else if (strcmp(jogadores[i].nome, nome) == 0 && strcmp(jogadores[i].senha, senha) == 0) // verifica se o jogador e senha
+    {
+      return &jogadores[i];
     }
   }
-  printf("Jogador '%s' não encontrado no ranking.\n", nome);
+  return NULL;
+}
+
+Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome, char *senha)
+{
+  *numJogadores += 1;
+  jogadores = realloc(jogadores, (*numJogadores) * sizeof(Jogador));
+  if (!jogadores)
+  {
+    perror("Erro ao realocar memória");
+    exit(EXIT_FAILURE);
+  }
+  strcpy(jogadores[*numJogadores - 1].nome, nome);
+  strcpy(jogadores[*numJogadores - 1].senha, senha);
+  jogadores[*numJogadores - 1].tempoAreaCentral = 0;
+  jogadores[*numJogadores - 1].pontos = 0;
+  jogadores[*numJogadores - 1].tempoTotal = 0;
+  return &jogadores[*numJogadores - 1];
 }

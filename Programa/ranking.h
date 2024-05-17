@@ -4,36 +4,20 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_JOGADORES 10
-
-typedef struct {
+typedef struct
+{
   char nome[25];
+  char senha[10];
   double tempoTotal;
   double tempoAreaCentral;
   int pontos;
-  int fasesCompletas;
 } Jogador;
 
-typedef struct {
-  Jogador jogadores[MAX_JOGADORES];
-  int numJogadores;
-} Ranking;
-
-void inicializaRanking(Ranking *ranking);
-
-void insertionSort(Ranking *ranking, int tipo);
-
-void adicionaJogador(Ranking *ranking, char *nome, double tempoTotal,
-                     int pontos, double tempoAreaCentral);
-
-void exibeRanking(const Ranking *ranking, int tipo);
-
-void salvarRanking(const Ranking *ranking);
-
-void carregarRanking(Ranking *ranking);
-
-void limparRanking(Ranking *ranking);
-
-void removerJogador(Ranking *ranking, char *nome);
+void insertionSort(Jogador *ranking, int numJogadores, int tipo);
+void exibeRanking(Jogador *ranking, int numJogadores);
+Jogador *lerRanking(const char *nomeArquivo, int *numJogadores);
+void salvarRanking(const char *nomeArquivo, Jogador *ranking, int numJogadores);
+Jogador *retornaJogador(Jogador *jogadores, int numJogadores, char *nome, char *senha);
+Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome, char *senha);
 
 #endif // RANKING_H_INCLUDED
