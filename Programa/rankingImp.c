@@ -52,7 +52,13 @@ void insertionSort(Jogador *ranking, int numJogadores, int tipo)
 
 void exibeRanking(Jogador *ranking, int numJogadores)
 {
-  printf("    NOME:     TEMPO TOTAL:   TEMPO AREA CENTRAL:   PONTUACAO:\n\n");
+  printf("    NAME:      TOTAL TIME:    CENTRAL AREA TIME:     SCORE:\n\n");
+  if (numJogadores == 0)
+  {
+    printf(ANSI_COLOR_GREEN);
+    printf("\t\t    THE RANKING IS EMPTY!\n");
+    printf(ANSI_COLOR_RESET);
+  }
   for (int i = 0; i < numJogadores && i < 10; i++)
   {
     printf("%d - %s\t     %.2f\t\t   %.2f\t\t   %d\n", i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
@@ -106,18 +112,11 @@ void salvarRanking(const char *nomeArquivo, Jogador *ranking, int numJogadores)
   fclose(arquivo);
 }
 
-Jogador *retornaJogador(Jogador *jogadores, int numJogadores, char *nome, char *senha)
+Jogador *retornaJogador(Jogador *jogadores, int numJogadores, char *nome)
 {
   for (int i = 0; i < numJogadores; i++)
   {
-    if (senha == NULL) // Verifica somente o nome
-    {
-      if (strcmp(jogadores[i].nome, nome) == 0) // Se existir um nome igual não é possivel cria novo jogador
-      {
-        return &jogadores[i];
-      }
-    }
-    else if (strcmp(jogadores[i].nome, nome) == 0 && strcmp(jogadores[i].senha, senha) == 0) // verifica se o jogador e senha
+    if (strcmp(jogadores[i].nome, nome) == 0) // verifica se o jogador existe
     {
       return &jogadores[i];
     }
@@ -125,7 +124,7 @@ Jogador *retornaJogador(Jogador *jogadores, int numJogadores, char *nome, char *
   return NULL;
 }
 
-Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome, char *senha)
+Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome)
 {
   *numJogadores += 1;
   jogadores = realloc(jogadores, (*numJogadores) * sizeof(Jogador));
@@ -135,7 +134,6 @@ Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome, cha
     exit(EXIT_FAILURE);
   }
   strcpy(jogadores[*numJogadores - 1].nome, nome);
-  strcpy(jogadores[*numJogadores - 1].senha, senha);
   jogadores[*numJogadores - 1].tempoAreaCentral = 0;
   jogadores[*numJogadores - 1].pontos = 0;
   jogadores[*numJogadores - 1].tempoTotal = 0;
