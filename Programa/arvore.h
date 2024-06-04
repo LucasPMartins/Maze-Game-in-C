@@ -15,6 +15,5 @@ typedef struct ArvoreBinaria
 // Protótipos das funções
 
 ArvoreBinaria *criarArvore();
-NoArvore *inserirNo(NoArvore *no, Grafo area);
-void inserirArea(ArvoreBinaria *arvore, Grafo area);
-void imprimirArvore(NoArvore *no); // Função auxiliar para imprimir a árvore (opcional)
+NoArvore *criarNo(Grafo area);
+void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral);

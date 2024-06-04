@@ -24,6 +24,7 @@ void printSobre();
 
 void iniciarJogo(Jogador *jogador);
 int JogarArea(Jogador *jogador, Grafo *grafo);
+int inicializarAreas(ArvoreBinaria *arvore);
 
 int retornaSala(Grafo *grafo, int sala_atual, int num);
 
@@ -360,39 +361,43 @@ void printMenuJogar(Jogador *jogadores, int *numJogadores)
 
 void iniciarJogo(Jogador *jogador)
 {
-    system("cls");
-    printf(ANSI_COLOR_GREEN);
-    printf("-----===============< B E S T  S C O R E >===============-----\n");
-    printf(ANSI_COLOR_RESET);
-    printf("NAME:      TOTAL TIME:    CENTRAL AREA TIME:     SCORE:\n");
-    printf("%s\t     %.2f\t\t   %.2f\t\t   %d\n", jogador->nome, jogador->tempoTotal, jogador->tempoAreaCentral, jogador->pontos);
-    printf(ANSI_COLOR_GREEN);
-    printf("------===============<******************>===============------\n");
-    printf(ANSI_COLOR_RESET);
-    int retorno = JogarArea(jogador, grafo);
-    if (retorno)
+    int sair = 0;
+    int op, i;
+    char tecla;
+
+    do
     {
-    }
+        system("cls");
+        printf(ANSI_COLOR_GREEN);
+        printf("-----===============< B E S T  S C O R E >===============-----\n");
+        printf(ANSI_COLOR_RESET);
+        printf("NAME:      TOTAL TIME:    CENTRAL AREA TIME:     SCORE:\n");
+        printf("%s\t     %.2f\t\t   %.2f\t\t   %d\n", jogador->nome, jogador->tempoTotal, jogador->tempoAreaCentral, jogador->pontos);
+        printf(ANSI_COLOR_GREEN);
+        printf("------===============<******************>===============------\n");
+        printf(ANSI_COLOR_RESET);
+
+    } while (!sair);
 }
 
-int inicializaAreas(ArvoreBinaria *arvore)
+int inicializarAreas(ArvoreBinaria *arvore)
 {
     srand(time(NULL));
 }
 
 int JogarArea(Jogador *jogador, Grafo *grafo)
 {
-    int sair = 0, sala_atual = 0, vidas = 0, sala_anterior = 0;
+    int sair = 0, sala_atual = 0, vidas = 1, sala_anterior = 0;
     int op, i;
     char tecla;
     do
     {
         system("cls");
         printf(ANSI_COLOR_GREEN);
-        printf("-------=================< R O O M - %d >=================-------\n", sala_atual + 1);
+        printf("-------=================< R O O M - %d >=================-------\n", sala_atual);
         printf(ANSI_COLOR_RESET);
         NoListaAdjacencia *percorre = grafo->array[sala_atual].cabeca;
-        i = 0;
+        i = sala_atual + 1;
         while (percorre)
         {
             printf("     Room %d\t", percorre->destino);
@@ -407,11 +412,19 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
         {
             printf("\n");
         }
-        printf(ANSI_COLOR_GREEN);
-        printf("------===============<******************>===============------\n");
-        printf(ANSI_COLOR_RESET);
-        printf(ANSI_COLOR_RESET);
-        printf("Select a Room (-1 to EXIT):");
+        if (!grafo->direcionado)
+        {
+            printf(ANSI_COLOR_GREEN);
+            printf("-------================< L I F E S - %d >================-------\n", vidas);
+            printf(ANSI_COLOR_RESET);
+        }
+        else
+        {
+            printf(ANSI_COLOR_GREEN);
+            printf("-------================<****************>================-------\n");
+            printf(ANSI_COLOR_RESET);
+        }
+        printf("\nSelect a Room (-1 to EXIT):");
         setbuf(stdin, NULL);
         printf(ANSI_COLOR_YELLOW);
         scanf("%d", &op);
@@ -427,19 +440,63 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                 i = retornaSala(grafo, sala_atual, op);
                 if (i == -1)
                     continue;
+                if (op == sala_anterior)
+                    vidas--;
                 sala_anterior = sala_atual;
                 sala_atual = op;
-                if (grafo->direcionado) // Area Central
+                if (!grafo->direcionado) // Area Central
                 {
+                    if (vidas <= 0) // Ficou sem vidas na area central, perdeu
+                    {
+                        printf(ANSI_COLOR_RED);
+                        printf("\nYou have reached a room with no exit and you have no more lifes, you have lost\n");
+                        printf("Try again!\n");
+                        printf(ANSI_COLOR_GREEN);
+                        printf("\nPress 'Esc' to EXIT...\n\n");
+                        printf(ANSI_COLOR_RESET);
+                        while (1)
+                        {
+                            if (_kbhit())
+                            {
+                                tecla = _getch();
+                                if (tecla == 27)
+                                { // Verifica se a tecla pressionada é o código ASCII do "Esc"
+                                    sair = 1;
+                                    return 2; // Perdeu na area central
+                                }
+                            }
+                        }
+                    }
                     vidas += grafo->array[sala_atual].peso;
                     jogador->pontos += grafo->array[sala_atual].peso;
                     grafo->array[sala_atual].peso = 0;
+                    // Aumentar salas do vetice
                 }
                 else // AREA NORMAL
                 {
                     if (grafo->array[sala_atual].ehSaida) // Proxima fase
                     {
-                        return 1; // Venceu
+                        printf(ANSI_COLOR_RED);
+                        printf("\nYou have reached a room with an exit, you have won\n");
+                        printf(ANSI_COLOR_GREEN);
+                        printf("\nPress 'Enter' to CONTINUE or 'Esc' to EXIT...\n\n");
+                        printf(ANSI_COLOR_RESET);
+                        while (1)
+                        {
+                            if (_kbhit())
+                            {
+                                tecla = _getch();
+                                if (tecla == 13)
+                                {             // Verifica se a tecla pressionada é o código ASCII do "Enter"
+                                    return 1; // Venceu na aerea normal
+                                }
+                                if (tecla == 27)
+                                { // Verifica se a tecla pressionada é o código ASCII do "Esc"
+                                    sair = 1;
+                                    break;
+                                }
+                            }
+                        }
                     }
                     if (!grafo->array[sala_atual].ehSaida && grafo->array[sala_atual].cabeca == NULL) // A Sala é um Sumidouro
                     {
@@ -447,7 +504,7 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                         printf("\nYou have reached a room with no exit, you have lost\n");
                         printf("Try again!\n");
                         printf(ANSI_COLOR_GREEN);
-                        printf("\nPress 'Enter' to PLAY or 'Esc' to BACK...\n\n");
+                        printf("\nPress 'Enter' to PLAY or 'Esc' to EXIT...\n\n");
                         printf(ANSI_COLOR_RESET);
                         while (1)
                         {
@@ -475,14 +532,17 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
 
 int retornaSala(Grafo *grafo, int sala_atual, int num)
 {
-    NoListaAdjacencia *percorre = grafo->array[sala_atual].cabeca;
-    while (percorre)
+    if (num >= 0 && sala_atual >= 0)
     {
-        if (percorre->destino == num)
+        NoListaAdjacencia *percorre = grafo->array[sala_atual].cabeca;
+        while (percorre)
         {
-            return num; // Sala existe
+            if (percorre->destino == num)
+            {
+                return num; // Sala existe
+            }
+            percorre = percorre->proximo;
         }
-        percorre = percorre->proximo;
     }
     return -1; // Sala não existe
 }

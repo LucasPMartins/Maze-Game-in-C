@@ -12,45 +12,68 @@ ArvoreBinaria *criarArvore()
     return arvore;
 }
 
-NoArvore *inserirNo(NoArvore *no, Grafo area)
+NoArvore *criarNo(Grafo area)
 {
-    if (no == NULL)
+    NoArvore *novoNo = (NoArvore *)malloc(sizeof(NoArvore));
+    if (novoNo == NULL)
     {
-        NoArvore *novoNo = (NoArvore *)malloc(sizeof(NoArvore));
-        if (novoNo)
-        {
-            novoNo->area = area;
-            novoNo->esquerda = NULL;
-            novoNo->direita = NULL;
-            return novoNo;
-        }
+        printf("Erro ao alocar memoria para novo no.\n");
+        exit(EXIT_FAILURE);
+    }
+    novoNo->area = area;
+    novoNo->esquerda = NULL;
+    novoNo->direita = NULL;
+    return novoNo;
+}
+
+void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral)
+{
+    NoArvore *novoNo = criarNo(area);
+
+    // Trata a inserção da area central diretamente
+    if (ehAreaCentral)
+    {
+        arvore->raiz = novoNo;
     }
     else
     {
-        if (area.chave < no->area.chave)
+        // Inserção padrão para nós que não são a area central
+        if (arvore->raiz == NULL)
         {
-            no->esquerda = inserirNo(no->esquerda, area);
+            arvore->raiz = novoNo; // Se arvore estar vazia, insere na raiz
         }
-        else if (area.chave > no->area.chave)
+        else
         {
-            no->direita = inserirNo(no->direita, area);
+            // Busca a posição de inserção baseada no número de vértices
+            NoArvore *atual = arvore->raiz;
+            NoArvore *anterior = NULL;
+            int ehEsquerda = 0;
+
+            // Encontra a posição de inserção
+            while (atual != NULL)
+            {
+                anterior = atual;
+                if (area.V < atual->area.V)
+                {
+                    atual = atual->esquerda;
+                    ehEsquerda = 1; // Indica que a insercão sera nó esquerda
+                }
+                else
+                {
+                    atual = atual->direita;
+                    ehEsquerda = 0; // Indica que a inserição sera nó direita
+                }
+            }
+
+            // Insere o novo nó na posicão encontrada
+            if (ehEsquerda)
+            {
+                anterior->esquerda = novoNo;
+            }
+            else
+            {
+                anterior->direita = novoNo;
+            }
         }
-    }
-    return no;
-}
-
-void inserirArea(ArvoreBinaria *arvore, Grafo area)
-{
-    arvore->raiz = inserirNo(arvore->raiz, area);
-}
-
-// Função auxiliar para imprimir a árvore (opcional)
-void imprimirArvore(NoArvore *no)
-{
-    if (no != NULL)
-    {
-        imprimirArvore(no->esquerda);
-        printf("%d ", no->area.chave);
-        imprimirArvore(no->direita);
     }
 }

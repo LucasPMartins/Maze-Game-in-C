@@ -25,7 +25,7 @@ typedef struct Grafo
     int direcionado;        // Flag para indicar se o grafo é direcionado (1) ou não (0)
 } Grafo;
 
-NoListaAdjacencia *novoNoListaAdjacencia(int destino, int peso);
+NoListaAdjacencia *novoNoListaAdjacencia(int destino);
 Grafo *criarGrafo(int V, int direcionado);
 void adicionarAresta(Grafo *grafo, int origem, int destino, int peso);
 void imprimirGrafo(Grafo *grafo);

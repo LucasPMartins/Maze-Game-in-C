@@ -4,11 +4,10 @@
 #include "grafo.h"
 
 // Função para criar um novo nó na lista de adjacência
-NoListaAdjacencia *novoNoListaAdjacencia(int destino, int peso)
+NoListaAdjacencia *novoNoListaAdjacencia(int destino)
 {
     NoListaAdjacencia *novoNo = (NoListaAdjacencia *)malloc(sizeof(NoListaAdjacencia));
     novoNo->destino = destino;
-    novoNo->peso = peso;
     novoNo->proximo = NULL;
     return novoNo;
 }
@@ -44,14 +43,15 @@ Grafo *criarGrafo(int V, int direcionado)
 // Função para adicionar uma aresta no grafo
 void adicionarAresta(Grafo *grafo, int origem, int destino, int peso)
 {
-    NoListaAdjacencia *novoNo = novoNoListaAdjacencia(destino, peso);
+    NoListaAdjacencia *novoNo = novoNoListaAdjacencia(destino);
+    grafo->array[destino].peso = peso;
     novoNo->proximo = grafo->array[origem].cabeca;
     grafo->array[origem].cabeca = novoNo;
 
     if (!grafo->direcionado)
     {
         // Se o grafo não for direcionado, adicione a mesma aresta na direção contrária também
-        novoNo = novoNoListaAdjacencia(origem, peso);
+        novoNo = novoNoListaAdjacencia(origem);
         novoNo->proximo = grafo->array[destino].cabeca;
         grafo->array[destino].cabeca = novoNo;
     }
@@ -66,7 +66,7 @@ void imprimirGrafo(Grafo *grafo)
         printf("\n Lista de adjacencia do vertice %d (e saida: %d)\n cabeça ", v, grafo->array[v].ehSaida);
         while (percorre)
         {
-            printf("-> %d (peso %d)", percorre->destino, percorre->peso);
+            printf("-> %d", percorre->destino);
             percorre = percorre->proximo;
         }
         printf("\n");
