@@ -1,3 +1,6 @@
+#ifndef ARVORE_H
+#define ARVORE_H
+
 #include "grafo.h"
 
 typedef struct NoArvore
@@ -7,7 +10,7 @@ typedef struct NoArvore
     struct NoArvore *direita;
 } NoArvore;
 
-typedef struct ArvoreBinaria
+typedef struct ArvoreBinarias
 {
     NoArvore *raiz;
 } ArvoreBinaria;
@@ -17,3 +20,5 @@ typedef struct ArvoreBinaria
 ArvoreBinaria *criarArvore();
 NoArvore *criarNo(Grafo area);
 void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral);
+
+#endif // ARVORE_H

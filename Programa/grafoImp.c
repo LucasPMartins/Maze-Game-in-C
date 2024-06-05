@@ -24,7 +24,9 @@ Grafo *criarGrafo(int V, int direcionado)
     srand(time(NULL));
 
     // Gera um índice de vértice para ser a saída
-    int saida = rand() % V;
+    int saida;
+    while (saida == 0)
+        saida = rand() % V;
 
     // Inicializar cada lista de adjacência como vazia e definir ehSaida como 0
     for (int i = 0; i < V; ++i)
@@ -88,4 +90,35 @@ void liberarGrafo(Grafo *grafo)
     }
     free(grafo->array);
     free(grafo);
+}
+
+// Função para adicionar vértices exponencialmente
+void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual)
+{
+    NoListaAdjacencia *percorre = grafo->array[sala_atual].cabeca;
+    while (percorre)
+    {
+        int destino = percorre->destino;
+
+        // Adiciona arestas para novos vértices exponencialmente
+        for (int i = 0; i < 2; i++)
+        {
+            int novo_vertice = grafo->V; // O novo vértice será o próximo na sequência
+
+            // Redimensionar o array de listas de adjacência se necessário
+            grafo->array = realloc(grafo->array, (novo_vertice + 1) * sizeof(ListaAdjacencia));
+            grafo->array[novo_vertice].cabeca = NULL;
+            grafo->array[novo_vertice].peso = 0;
+            grafo->array[novo_vertice].ehSaida = 0;
+
+            // Incrementa o número de vértices no grafo
+            grafo->V++;
+
+            // Adiciona aresta do vértice atual para o novo vértice
+            adicionarAresta(grafo, destino, novo_vertice, rand() % 2);
+        }
+
+        // Avançar para o próximo nó na lista de adjacência
+        percorre = percorre->proximo;
+    }
 }

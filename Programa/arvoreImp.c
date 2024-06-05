@@ -1,4 +1,7 @@
 #include "arvore.h"
+#include "grafo.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // Implementação das funções
 

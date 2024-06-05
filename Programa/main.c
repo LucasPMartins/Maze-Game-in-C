@@ -1,5 +1,6 @@
 #include "arvore.h"
 #include "grafo.h"
+#include "pilha.h"
 #include "ranking.h"
 
 #include <stdio.h>
@@ -7,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
+#include <sys/time.h>
 #include <windows.h> //sleep
 
 #define ANSI_COLOR_RED "\x1b[31m" // coloca cor nos textos
@@ -24,7 +26,7 @@ void printSobre();
 
 void iniciarJogo(Jogador *jogador);
 int JogarArea(Jogador *jogador, Grafo *grafo);
-int inicializarAreas(ArvoreBinaria *arvore);
+ArvoreBinaria *inicializarAreas();
 
 int retornaSala(Grafo *grafo, int sala_atual, int num);
 
@@ -365,6 +367,19 @@ void iniciarJogo(Jogador *jogador)
     int op, i;
     char tecla;
 
+    double tempo;
+    struct timeval inicio, fim;
+
+    // ArvoreBinaria *arvore = inicializarAreas();
+    int V = 5;
+    Grafo *grafo = criarGrafo(V, 0);
+    adicionarAresta(grafo, 0, 1, 1);
+    adicionarAresta(grafo, 0, 2, 2);
+    adicionarAresta(grafo, 1, 2, 0);
+    adicionarAresta(grafo, 1, 3, 0);
+    adicionarAresta(grafo, 2, 4, 0);
+
+    // Pilha *pilha = inicializarPercurso(&arvore); // Pilha de grafos a serem usados
     do
     {
         system("cls");
@@ -376,11 +391,19 @@ void iniciarJogo(Jogador *jogador)
         printf(ANSI_COLOR_GREEN);
         printf("------===============<******************>===============------\n");
         printf(ANSI_COLOR_RESET);
-
+        gettimeofday(&inicio, NULL);
+        JogarArea(jogador, grafo);
+        gettimeofday(&fim, NULL);
+        tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
+        printf("PLAYING TIME: %.2f\n", tempo);
+        system("pause");
     } while (!sair);
+
+    // free(pilha->nos);
+    // free(pilha);
 }
 
-int inicializarAreas(ArvoreBinaria *arvore)
+ArvoreBinaria *inicializarAreas()
 {
     srand(time(NULL));
 }
@@ -390,25 +413,32 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
     int sair = 0, sala_atual = 0, vidas = 1, sala_anterior = 0;
     int op, i;
     char tecla;
+
+    double tempo;
+    struct timeval inicio, fim;
+
+    if (!grafo->direcionado)
+        gettimeofday(&inicio, NULL);
     do
     {
         system("cls");
+        print_logo();
         printf(ANSI_COLOR_GREEN);
         printf("-------=================< R O O M - %d >=================-------\n", sala_atual);
         printf(ANSI_COLOR_RESET);
         NoListaAdjacencia *percorre = grafo->array[sala_atual].cabeca;
-        i = sala_atual + 1;
+        i = 0;
         while (percorre)
         {
-            printf("     Room %d\t", percorre->destino);
+            printf("Room %d\t", percorre->destino);
             percorre = percorre->proximo;
             i++;
-            if (i % 4 == 0)
+            if (i % 5 == 0)
             {
                 printf("\n");
             }
         }
-        if (i % 4 != 0)
+        if (i % 5 != 0)
         {
             printf("\n");
         }
@@ -421,7 +451,7 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
         else
         {
             printf(ANSI_COLOR_GREEN);
-            printf("-------================<****************>================-------\n");
+            printf("-------================<***************>================-------\n");
             printf(ANSI_COLOR_RESET);
         }
         printf("\nSelect a Room (-1 to EXIT):");
@@ -440,17 +470,16 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                 i = retornaSala(grafo, sala_atual, op);
                 if (i == -1)
                     continue;
-                if (op == sala_anterior)
+                if (op == sala_anterior && !grafo->direcionado)
                     vidas--;
                 sala_anterior = sala_atual;
                 sala_atual = op;
                 if (!grafo->direcionado) // Area Central
                 {
-                    if (vidas <= 0) // Ficou sem vidas na area central, perdeu
+                    if (vidas < 0) // Ficou sem vidas na area central, perdeu
                     {
                         printf(ANSI_COLOR_RED);
-                        printf("\nYou have reached a room with no exit and you have no more lifes, you have lost\n");
-                        printf("Try again!\n");
+                        printf("\nYou have reached a room with no exit and you have no more lifes,\nyou have lost!\n");
                         printf(ANSI_COLOR_GREEN);
                         printf("\nPress 'Esc' to EXIT...\n\n");
                         printf(ANSI_COLOR_RESET);
@@ -462,6 +491,9 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                                 if (tecla == 27)
                                 { // Verifica se a tecla pressionada é o código ASCII do "Esc"
                                     sair = 1;
+                                    gettimeofday(&fim, NULL);
+                                    tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
+                                    jogador->tempoAreaCentral = tempo;
                                     return 2; // Perdeu na area central
                                 }
                             }
@@ -471,14 +503,15 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                     jogador->pontos += grafo->array[sala_atual].peso;
                     grafo->array[sala_atual].peso = 0;
                     // Aumentar salas do vetice
+                    if (grafo->array[sala_atual].cabeca == NULL)
+                        adicionarVerticesExponencialmente(grafo, sala_atual);
                 }
                 else // AREA NORMAL
                 {
                     if (grafo->array[sala_atual].ehSaida) // Proxima fase
                     {
-                        printf(ANSI_COLOR_RED);
-                        printf("\nYou have reached a room with an exit, you have won\n");
                         printf(ANSI_COLOR_GREEN);
+                        printf("\nYou have reached a room with an exit, you have won\n");
                         printf("\nPress 'Enter' to CONTINUE or 'Esc' to EXIT...\n\n");
                         printf(ANSI_COLOR_RESET);
                         while (1)
@@ -513,6 +546,7 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                                 tecla = _getch();
                                 if (tecla == 13)
                                 { // Verifica se a tecla pressionada é o código ASCII do "Enter"
+                                    sala_atual = 0;
                                     break;
                                 }
                                 if (tecla == 27)
@@ -527,6 +561,12 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
             }
         }
     } while (!sair);
+    if (!grafo->direcionado)
+    {
+        gettimeofday(&fim, NULL);
+        tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
+        jogador->tempoAreaCentral = tempo;
+    }
     return 0; // Desistiu
 }
 

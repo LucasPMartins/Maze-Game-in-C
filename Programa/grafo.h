@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef GRAFO_H
+#define GRAFO_H
 
 // Estrutura para representar um nó na lista de adjacência
 typedef struct NoListaAdjacencia
@@ -30,3 +30,6 @@ Grafo *criarGrafo(int V, int direcionado);
 void adicionarAresta(Grafo *grafo, int origem, int destino, int peso);
 void imprimirGrafo(Grafo *grafo);
 void liberarGrafo(Grafo *grafo);
+void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual);
+
+#endif // GRAFO_H
