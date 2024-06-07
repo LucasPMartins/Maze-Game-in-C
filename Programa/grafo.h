@@ -32,5 +32,7 @@ void imprimirGrafo(Grafo *grafo);
 void liberarGrafo(Grafo *grafo);
 void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual, int sala_anterior);
 void defineSaida(Grafo *grafo);
+void imprimirCaminho(int *predecessor, int origem, int destino);
+void encontrarCaminhoMaisCurto(Grafo *grafo, int origem, int destino, int *predecessor);
 
 #endif // GRAFO_H

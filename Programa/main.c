@@ -28,6 +28,7 @@ void iniciarJogo(Jogador *jogador);
 int JogarArea(Jogador *jogador, Grafo *grafo);
 ArvoreBinaria *inicializarAreas();
 int retornaSala(Grafo *grafo, int sala_atual, int num);
+void fornecerDica(Grafo *grafo, int sala_atual);
 
 void imprimelento(char *p, int N);
 
@@ -362,74 +363,121 @@ void printMenuJogar(Jogador *jogadores, int *numJogadores)
 
 void iniciarJogo(Jogador *jogador)
 {
-    int sair = 0;
-    int op, i, retorno;
+    int sair = 0, i;
+    int retorno;
     char tecla;
 
     double tempo;
     struct timeval inicio, fim;
 
     ArvoreBinaria *arvore = inicializarAreas();
-
+    if (!arvore)
+    {
+        fprintf(stderr, "Erro ao inicializar a árvore de áreas.\n");
+        return;
+    }
     Pilha *pilha = inicializarPercurso(arvore); // Pilha de grafos a serem usados
+    if (!pilha)
+    {
+        fprintf(stderr, "Erro ao inicializar a pilha.\n");
+        liberarArvore(arvore->raiz);
+        free(arvore);
+        return;
+    }
+
+    gettimeofday(&inicio, NULL); // INICIA O TEMPO TOTAL
 
     Grafo *grafo = proximoNo(pilha);
-
-    gettimeofday(&inicio, NULL);
-
-    do
+    while (grafo != NULL && !sair)
     {
-        retorno = JogarArea(jogador, grafo);
-        if (retorno == 1 || retorno == 2)
-            liberarGrafo(grafo);
         system("cls");
         print_logo();
         printf(ANSI_COLOR_GREEN);
         printf("-----===============< B E S T  S C O R E >===============-----\n");
         printf(ANSI_COLOR_RESET);
         printf("NAME:      TOTAL TIME:    CENTRAL AREA TIME:     SCORE:\n");
-        printf("%s\t     %.2f\t\t   %.2f\t\t   %d\n", jogador->nome, jogador->tempoTotal, jogador->tempoAreaCentral, jogador->pontos);
+        printf("%s\t     %.2f\t   %.2f\t\t   %d\n", jogador->nome, jogador->tempoTotal, jogador->tempoAreaCentral, jogador->pontos);
         printf(ANSI_COLOR_GREEN);
         printf("------===============<******************>===============------\n");
-        printf(ANSI_COLOR_RESET);
-        printf(ANSI_COLOR_GREEN);
         printf("\nPress 'Enter' to CONTINUE or 'Esc' to EXIT...\n\n");
         printf(ANSI_COLOR_RESET);
+
         while (1)
         {
             if (_kbhit())
             {
                 tecla = _getch();
-                if (tecla == 13)
-                { // Verifica se a tecla pressionada é o código ASCII do "Enter"
+                if (tecla == 13) // Verifica se a tecla pressionada é o código ASCII do "Enter"
+                {
+                    retorno = JogarArea(jogador, grafo);
                     if (retorno == 2)
                     {
                         liberarArvore(arvore->raiz);
+                        arvore->raiz = NULL;
+                        free(arvore);
                         arvore = inicializarAreas();
+                        if (arvore == NULL)
+                        {
+                            fprintf(stderr, "Erro ao reinicializar a árvore de áreas.\n");
+                            liberarPilha(pilha);
+                            free(pilha);
+                            system("oause");
+                            return;
+                        }
                         liberarPilha(pilha);
+                        free(pilha);
                         pilha = inicializarPercurso(arvore);
-                        grafo = proximoNo(pilha);
+                        if (pilha == NULL)
+                        {
+                            fprintf(stderr, "Erro ao reinicializar a pilha.\n");
+                            liberarArvore(arvore->raiz);
+                            free(arvore);
+                            system("oause");
+                            return;
+                        }
                     }
                     if (retorno == 1)
-                        grafo = proximoNo(pilha);
+                    {
+                        printf(ANSI_COLOR_YELLOW);
+                        printf("LOADING NEXT AREA");
+                        i = 3;
+                        while (i > 0)
+                        {
+                            imprimelento("...", 250);
+                            printf("\b\b\b   \b\b\b");
+                            i--;
+                        }
+                        printf(ANSI_COLOR_RESET);
+                        liberarGrafo(grafo);
+                    }
+                    break; // Sai do loop interno para continuar o jogo
                 }
-                if (tecla == 27)
-                { // Verifica se a tecla pressionada é o código ASCII do "Esc"
+                if (tecla == 27) // Verifica se a tecla pressionada é o código ASCII do "Esc"
+                {
                     sair = 1;
                     break;
                 }
             }
         }
-    } while (!sair);
 
-    gettimeofday(&fim, NULL);
+        if (!sair && proximoNo(pilha) != NULL)
+        {
+            grafo = proximoNo(pilha);
+        }
+    }
+
+    gettimeofday(&fim, NULL); // FINALIZA O TEMPO TOTAL
     tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
     jogador->tempoTotal = tempo;
 
     while ((grafo = proximoNo(pilha)) != NULL)
-        free(grafo);
+    {
+        liberarGrafo(grafo);
+    }
     liberarArvore(arvore->raiz);
+    free(arvore);
     liberarPilha(pilha);
+    free(pilha);
 }
 
 ArvoreBinaria *inicializarAreas()
@@ -437,88 +485,88 @@ ArvoreBinaria *inicializarAreas()
     srand(time(NULL));
 
     // Grafo 1:
-    Grafo *grafo1 = criarGrafo(9, 1);
-    adicionarAresta(grafo1, 0, 1, 0);
-    adicionarAresta(grafo1, 0, 2, 0);
-    adicionarAresta(grafo1, 1, 3, 0);
-    adicionarAresta(grafo1, 1, 4, 0);
-    adicionarAresta(grafo1, 1, 5, 0);
-    adicionarAresta(grafo1, 2, 6, 0);
-    adicionarAresta(grafo1, 2, 7, 0);
-    adicionarAresta(grafo1, 2, 8, 0);
-    defineSaida(grafo1);
+    // Grafo *grafo1 = criarGrafo(9, 1);
+    // adicionarAresta(grafo1, 0, 1, 0);
+    // adicionarAresta(grafo1, 0, 2, 0);
+    // adicionarAresta(grafo1, 1, 3, 0);
+    // adicionarAresta(grafo1, 1, 4, 0);
+    // adicionarAresta(grafo1, 1, 5, 0);
+    // adicionarAresta(grafo1, 2, 6, 0);
+    // adicionarAresta(grafo1, 2, 7, 0);
+    // adicionarAresta(grafo1, 2, 8, 0);
+    // defineSaida(grafo1);
 
-    // Grafo 2:
-    Grafo *grafo2 = criarGrafo(9, 1);
-    adicionarAresta(grafo2, 0, 1, 0);
-    adicionarAresta(grafo2, 0, 2, 0);
+    // // Grafo 2:
+    // Grafo *grafo2 = criarGrafo(9, 1);
+    // adicionarAresta(grafo2, 0, 1, 0);
+    // adicionarAresta(grafo2, 0, 2, 0);
 
-    adicionarAresta(grafo2, 1, 3, 0);
-    adicionarAresta(grafo2, 1, 4, 0);
-    adicionarAresta(grafo2, 1, 5, 0);
+    // adicionarAresta(grafo2, 1, 3, 0);
+    // adicionarAresta(grafo2, 1, 4, 0);
+    // adicionarAresta(grafo2, 1, 5, 0);
 
-    adicionarAresta(grafo2, 2, 6, 0);
-    adicionarAresta(grafo2, 2, 7, 0);
-    adicionarAresta(grafo2, 2, 8, 0);
+    // adicionarAresta(grafo2, 2, 6, 0);
+    // adicionarAresta(grafo2, 2, 7, 0);
+    // adicionarAresta(grafo2, 2, 8, 0);
 
-    adicionarVerticesExponencialmente(grafo2, 3, 1);
-    adicionarVerticesExponencialmente(grafo2, 4, 1);
-    adicionarVerticesExponencialmente(grafo2, 5, 1);
-    adicionarVerticesExponencialmente(grafo2, 6, 2);
-    adicionarVerticesExponencialmente(grafo2, 7, 2);
-    adicionarVerticesExponencialmente(grafo2, 8, 2);
-    defineSaida(grafo2);
+    // adicionarVerticesExponencialmente(grafo2, 3, 1);
+    // adicionarVerticesExponencialmente(grafo2, 4, 1);
+    // adicionarVerticesExponencialmente(grafo2, 5, 1);
+    // adicionarVerticesExponencialmente(grafo2, 6, 2);
+    // adicionarVerticesExponencialmente(grafo2, 7, 2);
+    // adicionarVerticesExponencialmente(grafo2, 8, 2);
+    // defineSaida(grafo2);
 
-    // Grafo 3:
-    Grafo *grafo3 = criarGrafo(9, 1);
-    adicionarAresta(grafo3, 0, 1, 0);
-    adicionarAresta(grafo3, 0, 2, 0);
+    // // Grafo 3:
+    // Grafo *grafo3 = criarGrafo(9, 1);
+    // adicionarAresta(grafo3, 0, 1, 0);
+    // adicionarAresta(grafo3, 0, 2, 0);
 
-    adicionarAresta(grafo3, 1, 3, 0);
-    adicionarAresta(grafo3, 1, 4, 0);
-    adicionarAresta(grafo3, 1, 5, 0);
+    // adicionarAresta(grafo3, 1, 3, 0);
+    // adicionarAresta(grafo3, 1, 4, 0);
+    // adicionarAresta(grafo3, 1, 5, 0);
 
-    adicionarAresta(grafo3, 2, 6, 0);
-    adicionarAresta(grafo3, 2, 7, 0);
-    adicionarAresta(grafo3, 2, 8, 0);
+    // adicionarAresta(grafo3, 2, 6, 0);
+    // adicionarAresta(grafo3, 2, 7, 0);
+    // adicionarAresta(grafo3, 2, 8, 0);
 
-    adicionarVerticesExponencialmente(grafo3, 3, 1);
-    adicionarVerticesExponencialmente(grafo3, 4, 1);
-    adicionarVerticesExponencialmente(grafo3, 5, 1);
-    adicionarVerticesExponencialmente(grafo3, 6, 2);
-    adicionarVerticesExponencialmente(grafo3, 7, 2);
-    adicionarVerticesExponencialmente(grafo3, 8, 2);
+    // adicionarVerticesExponencialmente(grafo3, 3, 1);
+    // adicionarVerticesExponencialmente(grafo3, 4, 1);
+    // adicionarVerticesExponencialmente(grafo3, 5, 1);
+    // adicionarVerticesExponencialmente(grafo3, 6, 2);
+    // adicionarVerticesExponencialmente(grafo3, 7, 2);
+    // adicionarVerticesExponencialmente(grafo3, 8, 2);
 
-    adicionarVerticesExponencialmente(grafo3, 9, 3);
-    adicionarVerticesExponencialmente(grafo3, 10, 3);
-    adicionarVerticesExponencialmente(grafo3, 11, 3);
-    adicionarVerticesExponencialmente(grafo3, 12, 3);
+    // adicionarVerticesExponencialmente(grafo3, 9, 3);
+    // adicionarVerticesExponencialmente(grafo3, 10, 3);
+    // adicionarVerticesExponencialmente(grafo3, 11, 3);
+    // adicionarVerticesExponencialmente(grafo3, 12, 3);
 
-    adicionarVerticesExponencialmente(grafo3, 13, 4);
-    adicionarVerticesExponencialmente(grafo3, 14, 4);
-    adicionarVerticesExponencialmente(grafo3, 15, 4);
-    adicionarVerticesExponencialmente(grafo3, 16, 4);
+    // adicionarVerticesExponencialmente(grafo3, 13, 4);
+    // adicionarVerticesExponencialmente(grafo3, 14, 4);
+    // adicionarVerticesExponencialmente(grafo3, 15, 4);
+    // adicionarVerticesExponencialmente(grafo3, 16, 4);
 
-    adicionarVerticesExponencialmente(grafo3, 17, 5);
-    adicionarVerticesExponencialmente(grafo3, 18, 5);
-    adicionarVerticesExponencialmente(grafo3, 19, 5);
-    adicionarVerticesExponencialmente(grafo3, 20, 5);
+    // adicionarVerticesExponencialmente(grafo3, 17, 5);
+    // adicionarVerticesExponencialmente(grafo3, 18, 5);
+    // adicionarVerticesExponencialmente(grafo3, 19, 5);
+    // adicionarVerticesExponencialmente(grafo3, 20, 5);
 
-    adicionarVerticesExponencialmente(grafo3, 21, 6);
-    adicionarVerticesExponencialmente(grafo3, 22, 6);
-    adicionarVerticesExponencialmente(grafo3, 23, 6);
-    adicionarVerticesExponencialmente(grafo3, 24, 6);
+    // adicionarVerticesExponencialmente(grafo3, 21, 6);
+    // adicionarVerticesExponencialmente(grafo3, 22, 6);
+    // adicionarVerticesExponencialmente(grafo3, 23, 6);
+    // adicionarVerticesExponencialmente(grafo3, 24, 6);
 
-    adicionarVerticesExponencialmente(grafo3, 25, 7);
-    adicionarVerticesExponencialmente(grafo3, 26, 7);
-    adicionarVerticesExponencialmente(grafo3, 27, 7);
-    adicionarVerticesExponencialmente(grafo3, 28, 7);
+    // adicionarVerticesExponencialmente(grafo3, 25, 7);
+    // adicionarVerticesExponencialmente(grafo3, 26, 7);
+    // adicionarVerticesExponencialmente(grafo3, 27, 7);
+    // adicionarVerticesExponencialmente(grafo3, 28, 7);
 
-    adicionarVerticesExponencialmente(grafo3, 29, 8);
-    adicionarVerticesExponencialmente(grafo3, 30, 8);
-    adicionarVerticesExponencialmente(grafo3, 31, 8);
-    adicionarVerticesExponencialmente(grafo3, 32, 8);
-    defineSaida(grafo3);
+    // adicionarVerticesExponencialmente(grafo3, 29, 8);
+    // adicionarVerticesExponencialmente(grafo3, 30, 8);
+    // adicionarVerticesExponencialmente(grafo3, 31, 8);
+    // adicionarVerticesExponencialmente(grafo3, 32, 8);
+    // defineSaida(grafo3);
 
     // Grafo AREA CENTRAL:
     Grafo *grafo4 = criarGrafo(9, 0);
@@ -537,9 +585,9 @@ ArvoreBinaria *inicializarAreas()
     ArvoreBinaria *arvore = criarArvore();
 
     inserir(arvore, *grafo4, 1);
-    inserir(arvore, *grafo1, 0);
-    inserir(arvore, *grafo2, 0);
-    inserir(arvore, *grafo3, 0);
+    // inserir(arvore, *grafo3, 0);
+    // inserir(arvore, *grafo2, 0);
+    // inserir(arvore, *grafo1, 0);
 
     return arvore;
 }
@@ -547,16 +595,16 @@ ArvoreBinaria *inicializarAreas()
 int JogarArea(Jogador *jogador, Grafo *grafo)
 {
     int sair = 0, sala_atual = 0, vidas = 1, sala_anterior = 0;
-    int op, i;
+    int op, i, pontos = 0;
     char tecla;
-
+    int limiteTentativas = 0; // Número de tentativas sem sucesso antes de fornecer uma dica
     double tempo;
     struct timeval inicio, fim;
-
     if (!grafo->direcionado)
         gettimeofday(&inicio, NULL);
     do
     {
+        srand(time(NULL));
         system("cls");
         print_logo();
         printf(ANSI_COLOR_GREEN);
@@ -591,13 +639,14 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
             printf(ANSI_COLOR_RESET);
         }
         printf("\nSelect a Room (-1 to EXIT):");
-        setbuf(stdin, NULL);
         printf(ANSI_COLOR_YELLOW);
+        setbuf(stdin, NULL);
         scanf("%d", &op);
         printf(ANSI_COLOR_RESET);
         if (op == -1) // Sair
         {
             sair = 1;
+            break;
         }
         else
         {
@@ -629,19 +678,26 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                                     sair = 1;
                                     gettimeofday(&fim, NULL);
                                     tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
-                                    jogador->tempoAreaCentral = tempo;
+                                    if (tempo > jogador->tempoAreaCentral)
+                                        jogador->tempoAreaCentral = tempo;
+                                    if (pontos > jogador->pontos)
+                                        jogador->pontos = pontos;
                                     return 2; // Perdeu na area central
                                 }
                             }
                         }
                     }
                     vidas += grafo->array[sala_atual].peso;
-                    jogador->pontos += grafo->array[sala_atual].peso;
+                    pontos += grafo->array[sala_atual].peso;
                     grafo->array[sala_atual].peso = 0;
                     grafo->array[sala_anterior].peso = 0;
                     // Aumentar salas do vetice
-                    if (grafo->array[sala_atual].cabeca->proximo == NULL)
-                        adicionarVerticesExponencialmente(grafo, sala_atual, sala_anterior);
+                    i = rand() % 11;
+                    if (i < 7)
+                    {
+                        if (grafo->array[sala_atual].cabeca->proximo == NULL)
+                            adicionarVerticesExponencialmente(grafo, sala_atual, sala_anterior);
+                    }
                 }
                 else // AREA NORMAL
                 {
@@ -649,7 +705,7 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                     {
                         printf(ANSI_COLOR_GREEN);
                         printf("\nYou have reached a room with an exit, you have won\n");
-                        printf("\nPress 'Enter' to CONTINUE or 'Esc' to EXIT...\n\n");
+                        printf("\nPress 'Enter' to CONTINUE...\n\n");
                         printf(ANSI_COLOR_RESET);
                         while (1)
                         {
@@ -659,11 +715,6 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                                 if (tecla == 13)
                                 {             // Verifica se a tecla pressionada é o código ASCII do "Enter"
                                     return 1; // Venceu na aerea normal
-                                }
-                                if (tecla == 27)
-                                { // Verifica se a tecla pressionada é o código ASCII do "Esc"
-                                    sair = 1;
-                                    break;
                                 }
                             }
                         }
@@ -683,6 +734,29 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
                                 tecla = _getch();
                                 if (tecla == 13)
                                 { // Verifica se a tecla pressionada é o código ASCII do "Enter"
+                                    limiteTentativas++;
+                                    if (limiteTentativas > 3)
+                                    {
+                                        printf(ANSI_COLOR_GREEN);
+                                        printf("Need help? Press 'Enter' for a hint or 'Esc' to SKIP...\n\n");
+                                        printf(ANSI_COLOR_RESET);
+                                        while (1)
+                                        {
+                                            if (_kbhit())
+                                            {
+                                                tecla = _getch();
+                                                if (tecla == 13)
+                                                { // Verifica se a tecla pressionada é o código ASCII do "Enter"
+                                                    fornecerDica(grafo, sala_atual);
+                                                    break;
+                                                }
+                                                if (tecla == 27)
+                                                { // Verifica se a tecla pressionada é o código ASCII do "Esc"
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
                                     sala_atual = 0;
                                     break;
                                 }
@@ -698,6 +772,15 @@ int JogarArea(Jogador *jogador, Grafo *grafo)
             }
         }
     } while (!sair);
+    if (!grafo->direcionado)
+    {
+        gettimeofday(&fim, NULL);
+        tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
+        if (tempo > jogador->tempoAreaCentral)
+            jogador->tempoAreaCentral = tempo;
+        if (pontos > jogador->pontos)
+            jogador->pontos = pontos;
+    }
     return 0; // Desistiu
 }
 
@@ -716,4 +799,41 @@ int retornaSala(Grafo *grafo, int sala_atual, int num)
         }
     }
     return -1; // Sala não existe
+}
+
+// Função para fornecer uma dica ao jogador
+void fornecerDica(Grafo *grafo, int sala_atual)
+{
+    int *predecessor = (int *)malloc(grafo->V * sizeof(int));
+    int saida = -1;
+
+    // Encontra uma sala de saída
+    for (int i = 0; i < grafo->V; i++)
+    {
+        if (grafo->array[i].ehSaida == 1)
+        {
+            saida = i;
+            break;
+        }
+    }
+
+    if (saida != -1)
+    {
+        encontrarCaminhoMaisCurto(grafo, sala_atual, saida, predecessor);
+        printf(ANSI_COLOR_GREEN);
+        printf("Tip: ");
+        printf(ANSI_COLOR_RESET);
+        printf("The shortest path to the exit is: ");
+        printf(ANSI_COLOR_GREEN);
+        imprimirCaminho(predecessor, sala_atual, saida);
+        printf(ANSI_COLOR_RESET);
+        printf("\n\n");
+        system("pause");
+    }
+    else
+    {
+        printf("Não há saída definida no grafo.\n");
+    }
+
+    free(predecessor);
 }

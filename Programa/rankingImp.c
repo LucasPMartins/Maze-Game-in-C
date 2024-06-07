@@ -61,7 +61,7 @@ void exibeRanking(Jogador *ranking, int numJogadores)
   }
   for (int i = 0; i < numJogadores && i < 10; i++)
   {
-    printf("%d - %s\t     %.2f\t\t   %.2f\t\t   %d\n", i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
+    printf("%d - %s\t     %.2f\t   %.2f\t\t   %d\n", i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
   }
   printf("\n");
 }

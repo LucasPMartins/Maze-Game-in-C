@@ -111,7 +111,7 @@ void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual, int sala_an
     // Adiciona novas arestas
     for (int i = 0; i < count; i++)
     {
-        adicionarAresta(grafo, sala_atual, novo_vertice, rand() % 2);
+        adicionarAresta(grafo, sala_atual, novo_vertice, rand() % 5);
         novo_vertice++;
     }
 
@@ -123,16 +123,81 @@ void defineSaida(Grafo *grafo)
 {
     srand(time(NULL));
 
-    int saida;
+    int saida = 0;
     while (saida == 0)
-        saida = rand() % grafo->V;
-
-    // Inicializar cada lista de adjacência como vazia e definir ehSaida como 0
-    for (int i = 0; i < grafo->V; ++i)
     {
-        if (i == saida)
+        saida = rand() % grafo->V;
+    }
+
+    // Define a sala sorteada como saída
+    grafo->array[saida].ehSaida = 1;
+}
+
+// Função para encontrar o caminho mais curto (usando busca em largura, por exemplo)
+void encontrarCaminhoMaisCurto(Grafo *grafo, int origem, int destino, int *predecessor)
+{
+    int *visitado = (int *)malloc(grafo->V * sizeof(int));
+    int *distancia = (int *)malloc(grafo->V * sizeof(int));
+    int *fila = (int *)malloc(grafo->V * sizeof(int));
+    int frente = 0, traseira = 0;
+
+    for (int i = 0; i < grafo->V; i++)
+    {
+        visitado[i] = 0;
+        distancia[i] = -1;
+        predecessor[i] = -1;
+    }
+
+    visitado[origem] = 1;
+    distancia[origem] = 0;
+    fila[traseira++] = origem;
+
+    while (frente < traseira)
+    {
+        int atual = fila[frente++];
+        NoListaAdjacencia *percorre = grafo->array[atual].cabeca;
+
+        while (percorre)
         {
-            grafo->array[i].ehSaida = 1; // Define a sala sorteada como saída
+            int adj = percorre->destino;
+            if (!visitado[adj])
+            {
+                visitado[adj] = 1;
+                distancia[adj] = distancia[atual] + 1;
+                predecessor[adj] = atual;
+                fila[traseira++] = adj;
+                if (adj == destino)
+                {
+                    free(visitado);
+                    free(distancia);
+                    free(fila);
+                    return;
+                }
+            }
+            percorre = percorre->proximo;
         }
     }
+
+    free(visitado);
+    free(distancia);
+    free(fila);
+}
+
+// Função para imprimir o caminho da origem ao destino
+void imprimirCaminho(int *predecessor, int origem, int destino)
+{
+    if (destino == -1)
+    {
+        // printf("No path exists\n");
+        return;
+    }
+
+    if (destino == origem)
+    {
+        printf("%d", origem);
+        return;
+    }
+
+    imprimirCaminho(predecessor, origem, predecessor[destino]);
+    printf(" -> %d", destino);
 }
