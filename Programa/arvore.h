@@ -20,5 +20,6 @@ typedef struct ArvoreBinarias
 ArvoreBinaria *criarArvore();
 NoArvore *criarNo(Grafo area);
 void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral);
+void liberarArvore(NoArvore *no);
 
 #endif // ARVORE_H

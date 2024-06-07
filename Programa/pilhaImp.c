@@ -9,9 +9,12 @@
 Pilha *criarPilha(int capacidade)
 {
     Pilha *pilha = (Pilha *)malloc(sizeof(Pilha));
-    pilha->capacidade = capacidade;
-    pilha->topo = -1;
-    pilha->nos = (NoArvore **)malloc(capacidade * sizeof(NoArvore *));
+    if (pilha)
+    {
+        pilha->capacidade = capacidade;
+        pilha->topo = -1;
+        pilha->nos = (NoArvore **)malloc(capacidade * sizeof(NoArvore *));
+    }
     return pilha;
 }
 
@@ -88,4 +91,14 @@ Grafo *proximoNo(Pilha *pilha)
     }
     NoArvore *no = desempilhar(pilha);
     return &no->area;
+}
+
+// Função para liberar a memória da pilha
+void liberarPilha(Pilha *pilha)
+{
+    if (pilha != NULL)
+    {
+        free(pilha->nos); // Libera o array de ponteiros
+        free(pilha);      // Libera a estrutura da pilha
+    }
 }

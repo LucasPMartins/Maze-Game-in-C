@@ -30,6 +30,7 @@ Grafo *criarGrafo(int V, int direcionado);
 void adicionarAresta(Grafo *grafo, int origem, int destino, int peso);
 void imprimirGrafo(Grafo *grafo);
 void liberarGrafo(Grafo *grafo);
-void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual);
+void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual, int sala_anterior);
+void defineSaida(Grafo *grafo);
 
 #endif // GRAFO_H

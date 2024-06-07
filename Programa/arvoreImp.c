@@ -5,6 +5,7 @@
 
 // Implementação das funções
 
+// Função para criar uma árvore binária
 ArvoreBinaria *criarArvore()
 {
     ArvoreBinaria *arvore = (ArvoreBinaria *)malloc(sizeof(ArvoreBinaria));
@@ -15,6 +16,7 @@ ArvoreBinaria *criarArvore()
     return arvore;
 }
 
+// Função para criar um nó da árvore binária
 NoArvore *criarNo(Grafo area)
 {
     NoArvore *novoNo = (NoArvore *)malloc(sizeof(NoArvore));
@@ -29,6 +31,7 @@ NoArvore *criarNo(Grafo area)
     return novoNo;
 }
 
+// Função para inserir um nó na árvore binária
 void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral)
 {
     NoArvore *novoNo = criarNo(area);
@@ -36,6 +39,12 @@ void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral)
     // Trata a inserção da area central diretamente
     if (ehAreaCentral)
     {
+        if (arvore->raiz != NULL)
+        {
+            printf("Erro: A área central já existe.\n");
+            free(novoNo);
+            return;
+        }
         arvore->raiz = novoNo;
     }
     else
@@ -64,7 +73,7 @@ void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral)
                 else
                 {
                     atual = atual->direita;
-                    ehEsquerda = 0; // Indica que a inserição sera nó direita
+                    ehEsquerda = 0; // Indica que a inserção sera nó direita
                 }
             }
 
@@ -79,4 +88,15 @@ void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral)
             }
         }
     }
+}
+
+// Função para liberar a memória de uma árvore binária
+
+void liberarArvore(NoArvore *no)
+{
+    if (no == NULL)
+        return;
+    liberarArvore(no->esquerda);
+    liberarArvore(no->direita);
+    free(no);
 }

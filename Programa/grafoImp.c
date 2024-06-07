@@ -20,22 +20,11 @@ Grafo *criarGrafo(int V, int direcionado)
     grafo->direcionado = direcionado;
     grafo->array = (ListaAdjacencia *)malloc(V * sizeof(ListaAdjacencia));
 
-    // Inicializa a semente para geração de números aleatórios
-    srand(time(NULL));
-
-    // Gera um índice de vértice para ser a saída
-    int saida;
-    while (saida == 0)
-        saida = rand() % V;
-
     // Inicializar cada lista de adjacência como vazia e definir ehSaida como 0
     for (int i = 0; i < V; ++i)
     {
+        grafo->array[i].peso = 0;
         grafo->array[i].ehSaida = 0; // Define todas as salas inicialmente como não sendo saídas
-        if (i == saida)
-        {
-            grafo->array[i].ehSaida = 1; // Define a sala sorteada como saída
-        }
         grafo->array[i].cabeca = NULL;
     }
 
@@ -93,32 +82,57 @@ void liberarGrafo(Grafo *grafo)
 }
 
 // Função para adicionar vértices exponencialmente
-void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual)
+void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual, int sala_anterior)
 {
-    NoListaAdjacencia *percorre = grafo->array[sala_atual].cabeca;
+    srand(time(NULL));
+
+    NoListaAdjacencia *percorre = grafo->array[sala_anterior].cabeca;
+    int count = 0;
     while (percorre)
     {
-        int destino = percorre->destino;
-
-        // Adiciona arestas para novos vértices exponencialmente
-        for (int i = 0; i < 2; i++)
-        {
-            int novo_vertice = grafo->V; // O novo vértice será o próximo na sequência
-
-            // Redimensionar o array de listas de adjacência se necessário
-            grafo->array = realloc(grafo->array, (novo_vertice + 1) * sizeof(ListaAdjacencia));
-            grafo->array[novo_vertice].cabeca = NULL;
-            grafo->array[novo_vertice].peso = 0;
-            grafo->array[novo_vertice].ehSaida = 0;
-
-            // Incrementa o número de vértices no grafo
-            grafo->V++;
-
-            // Adiciona aresta do vértice atual para o novo vértice
-            adicionarAresta(grafo, destino, novo_vertice, rand() % 2);
-        }
-
-        // Avançar para o próximo nó na lista de adjacência
+        count++;
         percorre = percorre->proximo;
+    }
+    if (grafo->direcionado)
+        count++;
+    int novo_vertice = grafo->V; // Inicia a partir do próximo índice disponível
+
+    // Realoca memória para o novo número total de vértices
+    grafo->array = realloc(grafo->array, (novo_vertice + count) * sizeof(ListaAdjacencia));
+
+    // Inicializa os novos vértices
+    for (int i = 0; i < count; i++)
+    {
+        grafo->array[novo_vertice + i].cabeca = NULL;
+        grafo->array[novo_vertice + i].peso = 0;
+        grafo->array[novo_vertice + i].ehSaida = 0;
+    }
+
+    // Adiciona novas arestas
+    for (int i = 0; i < count; i++)
+    {
+        adicionarAresta(grafo, sala_atual, novo_vertice, rand() % 2);
+        novo_vertice++;
+    }
+
+    // Atualiza o número de vértices no grafo
+    grafo->V = novo_vertice;
+}
+
+void defineSaida(Grafo *grafo)
+{
+    srand(time(NULL));
+
+    int saida;
+    while (saida == 0)
+        saida = rand() % grafo->V;
+
+    // Inicializar cada lista de adjacência como vazia e definir ehSaida como 0
+    for (int i = 0; i < grafo->V; ++i)
+    {
+        if (i == saida)
+        {
+            grafo->array[i].ehSaida = 1; // Define a sala sorteada como saída
+        }
     }
 }
