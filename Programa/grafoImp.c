@@ -111,7 +111,7 @@ void adicionarVerticesExponencialmente(Grafo *grafo, int sala_atual, int sala_an
     // Adiciona novas arestas
     for (int i = 0; i < count; i++)
     {
-        adicionarAresta(grafo, sala_atual, novo_vertice, rand() % 5);
+        adicionarAresta(grafo, sala_atual, novo_vertice, rand() % 4);
         novo_vertice++;
     }
 

@@ -14,6 +14,14 @@ void insertionSort(Jogador *ranking, int numJogadores, int tipo)
 {
   int i, j;
   Jogador key;
+
+  if (numJogadores <= 0)
+  {
+    printf("Nenhum jogador para ordenar.\n");
+    return;
+  }
+
+  // Ordenar por tempo na área central
   if (tipo == 1)
   {
     for (i = 1; i < numJogadores && i <= 10; i++)
@@ -24,11 +32,12 @@ void insertionSort(Jogador *ranking, int numJogadores, int tipo)
       while (j >= 0 && ranking[j].tempoAreaCentral < key.tempoAreaCentral)
       {
         ranking[j + 1] = ranking[j];
-        j = j - 1;
+        j--;
       }
       ranking[j + 1] = key;
     }
   }
+  // Ordenar por pontuação
   else if (tipo == 2)
   {
     for (i = 1; i < numJogadores && i <= 10; i++)
@@ -39,29 +48,33 @@ void insertionSort(Jogador *ranking, int numJogadores, int tipo)
       while (j >= 0 && ranking[j].pontos < key.pontos)
       {
         ranking[j + 1] = ranking[j];
-        j = j - 1;
+        j--;
       }
       ranking[j + 1] = key;
     }
   }
   else
   {
-    printf("Erro na ordenacao!");
+    printf("Erro na ordenacao: tipo de ordenacao invalido!\n");
   }
 }
 
 void exibeRanking(Jogador *ranking, int numJogadores)
 {
   printf("    NAME:      TOTAL TIME:    CENTRAL AREA TIME:     SCORE:\n\n");
+
   if (numJogadores == 0)
   {
     printf(ANSI_COLOR_GREEN);
     printf("\t\t    THE RANKING IS EMPTY!\n");
     printf(ANSI_COLOR_RESET);
+    return;
   }
+
   for (int i = 0; i < numJogadores && i < 10; i++)
   {
-    printf("%d - %s\t     %.2f\t   %.2f\t\t   %d\n", i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
+    printf("%d - %s\t     %.2f\t   %.2f\t\t   %d\n",
+           i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
   }
   printf("\n");
 }
@@ -124,18 +137,45 @@ Jogador *retornaJogador(Jogador *jogadores, int numJogadores, char *nome)
   return NULL;
 }
 
-Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome)
+Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, const char *nome)
 {
-  *numJogadores += 1;
+  if (!nome || !numJogadores)
+  {
+    fprintf(stderr, "Argumentos inválidos passados para adicionarJogador.\n");
+    return NULL;
+  }
+
+  // Aumenta o número de jogadores
+  (*numJogadores)++;
+
+  // Realoca memória para acomodar o novo jogador
   jogadores = realloc(jogadores, (*numJogadores) * sizeof(Jogador));
   if (!jogadores)
   {
     perror("Erro ao realocar memória");
-    exit(EXIT_FAILURE);
+    return NULL; // Retorna NULL para indicar falha
   }
-  strcpy(jogadores[*numJogadores - 1].nome, nome);
-  jogadores[*numJogadores - 1].tempoAreaCentral = 0;
-  jogadores[*numJogadores - 1].pontos = 0;
-  jogadores[*numJogadores - 1].tempoTotal = 0;
-  return &jogadores[*numJogadores - 1];
+
+  // Inicializa o novo jogador
+  Jogador *novoJogador = &jogadores[*numJogadores - 1];
+  memset(novoJogador, 0, sizeof(Jogador)); // Inicializa com zeros
+  strncpy(novoJogador->nome, nome, sizeof(novoJogador->nome) - 1);
+  novoJogador->nome[sizeof(novoJogador->nome) - 1] = '\0'; // Garante terminação nula
+
+  return novoJogador;
 }
+// Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome)
+// {
+//   (*numJogadores) += 1;
+//   jogadores = realloc(jogadores, (*numJogadores) * sizeof(Jogador));
+//   if (!jogadores)
+//   {
+//     perror("Erro ao realocar memória");
+//     exit(EXIT_FAILURE);
+//   }
+//   strcpy(jogadores[*numJogadores - 1].nome, nome);
+//   jogadores[*numJogadores - 1].tempoAreaCentral = 0;
+//   jogadores[*numJogadores - 1].pontos = 0;
+//   jogadores[*numJogadores - 1].tempoTotal = 0;
+//   return &jogadores[*numJogadores - 1];
+// }

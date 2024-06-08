@@ -36,15 +36,13 @@ int main()
 {
     char *menuOptions[] = {" P L A Y\n", " R A N K I N G\n", " A B O U T\n", " E X I T\n"};
     int numOptions = sizeof(menuOptions) / sizeof(menuOptions[0]);
-    int selectedIndex = 0, sair = 0;
+    int selectedIndex = 0, sair = 0, i;
     char input;
 
-    Jogador *jogadores = (Jogador *)malloc(sizeof(Jogador));
     int numJogadores = 0;
+    Jogador *jogadores = malloc(sizeof(Jogador));
+    // lerRanking("ranking.txt", &numJogadores);
 
-    jogadores = lerRanking("ranking.txt", &numJogadores);
-
-    int i;
     do
     {
         print_logo();
@@ -94,12 +92,10 @@ int main()
             {
                 printf(ANSI_COLOR_YELLOW);
                 printf("Exiting the game");
-                i = 3;
-                while (i > 0)
+                for (i = 0; i < 3; i++)
                 {
                     imprimelento("...", 250);
                     printf("\b\b\b   \b\b\b");
-                    i--;
                 }
                 printf("\n\n");
                 printf(ANSI_COLOR_RESET);
@@ -115,7 +111,7 @@ int main()
                 {
                     printRanking(jogadores, numJogadores);
                 }
-                if (selectedIndex == 2) // SOBRE
+                else if (selectedIndex == 2) // SOBRE
                 {
                     printSobre();
                 }
@@ -125,9 +121,12 @@ int main()
             break;
         }
     } while (sair != 1); // Loop até que a opção "Sair" seja selecionada
+
     salvarRanking("ranking.txt", jogadores, numJogadores);
-    //  Liberar a memória alocada para o vetor de jogadores
+
+    // Liberar a memória alocada para o vetor de jogadores
     free(jogadores);
+
     return 0;
 }
 
@@ -317,7 +316,7 @@ void printRanking(Jogador *jogadores, int numJogadores)
 void printMenuJogar(Jogador *jogadores, int *numJogadores)
 {
     char nome[50];
-    Jogador *jogador = malloc(sizeof(Jogador));
+    Jogador *jogador;
     int i;
 
     print_logo();
@@ -327,13 +326,19 @@ void printMenuJogar(Jogador *jogadores, int *numJogadores)
     printf("\nEnter your name: ");
     printf(ANSI_COLOR_YELLOW);
     setbuf(stdin, NULL);
-    scanf("%s", &nome);
+    scanf("%49s", nome);
     printf(ANSI_COLOR_RESET);
-    nome[strcspn(nome, "\n")] = '\0';
+
     jogador = retornaJogador(jogadores, *numJogadores, nome);
     if (jogador == NULL) // NOVO JOGADOR
     {
         jogador = adicionarJogador(jogadores, numJogadores, nome);
+        if (jogador == NULL)
+        {
+            printf("Erro na criação de jogador");
+            system("pause");
+            return;
+        }
         printf(ANSI_COLOR_YELLOW);
         printf("\nSAVING");
         i = 3;
@@ -388,6 +393,7 @@ void iniciarJogo(Jogador *jogador)
     gettimeofday(&inicio, NULL); // INICIA O TEMPO TOTAL
 
     Grafo *grafo = proximoNo(pilha);
+
     while (grafo != NULL && !sair)
     {
         system("cls");
@@ -401,7 +407,6 @@ void iniciarJogo(Jogador *jogador)
         printf("------===============<******************>===============------\n");
         printf("\nPress 'Enter' to CONTINUE or 'Esc' to EXIT...\n\n");
         printf(ANSI_COLOR_RESET);
-
         while (1)
         {
             if (_kbhit())
@@ -412,29 +417,16 @@ void iniciarJogo(Jogador *jogador)
                     retorno = JogarArea(jogador, grafo);
                     if (retorno == 2)
                     {
-                        liberarArvore(arvore->raiz);
-                        arvore->raiz = NULL;
-                        free(arvore);
-                        arvore = inicializarAreas();
-                        if (arvore == NULL)
-                        {
-                            fprintf(stderr, "Erro ao reinicializar a árvore de áreas.\n");
-                            liberarPilha(pilha);
-                            free(pilha);
-                            system("oause");
-                            return;
-                        }
-                        liberarPilha(pilha);
-                        free(pilha);
-                        pilha = inicializarPercurso(arvore);
-                        if (pilha == NULL)
-                        {
-                            fprintf(stderr, "Erro ao reinicializar a pilha.\n");
-                            liberarArvore(arvore->raiz);
-                            free(arvore);
-                            system("oause");
-                            return;
-                        }
+                        system("cls");
+                        print_logo();
+                        printf(ANSI_COLOR_GREEN);
+                        printf("-----===============< Y O U R  S C O R E >===============-----\n");
+                        printf(ANSI_COLOR_RESET);
+                        printf("NAME:      TOTAL TIME:    CENTRAL AREA TIME:     SCORE:\n");
+                        printf("%s\t     %.2f\t   %.2f\t\t   %d\n", jogador->nome, jogador->tempoTotal, jogador->tempoAreaCentral, jogador->pontos);
+                        printf(ANSI_COLOR_GREEN);
+                        printf("------===============<******************>===============------\n\n");
+                        system("pause");
                     }
                     if (retorno == 1)
                     {
@@ -459,8 +451,7 @@ void iniciarJogo(Jogador *jogador)
                 }
             }
         }
-
-        if (!sair && proximoNo(pilha) != NULL)
+        if (!sair)
         {
             grafo = proximoNo(pilha);
         }
@@ -470,13 +461,7 @@ void iniciarJogo(Jogador *jogador)
     tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
     jogador->tempoTotal = tempo;
 
-    while ((grafo = proximoNo(pilha)) != NULL)
-    {
-        liberarGrafo(grafo);
-    }
-    liberarArvore(arvore->raiz);
     free(arvore);
-    liberarPilha(pilha);
     free(pilha);
 }
 
@@ -485,88 +470,88 @@ ArvoreBinaria *inicializarAreas()
     srand(time(NULL));
 
     // Grafo 1:
-    // Grafo *grafo1 = criarGrafo(9, 1);
-    // adicionarAresta(grafo1, 0, 1, 0);
-    // adicionarAresta(grafo1, 0, 2, 0);
-    // adicionarAresta(grafo1, 1, 3, 0);
-    // adicionarAresta(grafo1, 1, 4, 0);
-    // adicionarAresta(grafo1, 1, 5, 0);
-    // adicionarAresta(grafo1, 2, 6, 0);
-    // adicionarAresta(grafo1, 2, 7, 0);
-    // adicionarAresta(grafo1, 2, 8, 0);
-    // defineSaida(grafo1);
+    Grafo *grafo1 = criarGrafo(9, 1);
+    adicionarAresta(grafo1, 0, 1, 0);
+    adicionarAresta(grafo1, 0, 2, 0);
+    adicionarAresta(grafo1, 1, 3, 0);
+    adicionarAresta(grafo1, 1, 4, 0);
+    adicionarAresta(grafo1, 1, 5, 0);
+    adicionarAresta(grafo1, 2, 6, 0);
+    adicionarAresta(grafo1, 2, 7, 0);
+    adicionarAresta(grafo1, 2, 8, 0);
+    defineSaida(grafo1);
 
     // // Grafo 2:
-    // Grafo *grafo2 = criarGrafo(9, 1);
-    // adicionarAresta(grafo2, 0, 1, 0);
-    // adicionarAresta(grafo2, 0, 2, 0);
+    Grafo *grafo2 = criarGrafo(9, 1);
+    adicionarAresta(grafo2, 0, 1, 0);
+    adicionarAresta(grafo2, 0, 2, 0);
 
-    // adicionarAresta(grafo2, 1, 3, 0);
-    // adicionarAresta(grafo2, 1, 4, 0);
-    // adicionarAresta(grafo2, 1, 5, 0);
+    adicionarAresta(grafo2, 1, 3, 0);
+    adicionarAresta(grafo2, 1, 4, 0);
+    adicionarAresta(grafo2, 1, 5, 0);
 
-    // adicionarAresta(grafo2, 2, 6, 0);
-    // adicionarAresta(grafo2, 2, 7, 0);
-    // adicionarAresta(grafo2, 2, 8, 0);
+    adicionarAresta(grafo2, 2, 6, 0);
+    adicionarAresta(grafo2, 2, 7, 0);
+    adicionarAresta(grafo2, 2, 8, 0);
 
-    // adicionarVerticesExponencialmente(grafo2, 3, 1);
-    // adicionarVerticesExponencialmente(grafo2, 4, 1);
-    // adicionarVerticesExponencialmente(grafo2, 5, 1);
-    // adicionarVerticesExponencialmente(grafo2, 6, 2);
-    // adicionarVerticesExponencialmente(grafo2, 7, 2);
-    // adicionarVerticesExponencialmente(grafo2, 8, 2);
-    // defineSaida(grafo2);
+    adicionarVerticesExponencialmente(grafo2, 3, 1);
+    adicionarVerticesExponencialmente(grafo2, 4, 1);
+    adicionarVerticesExponencialmente(grafo2, 5, 1);
+    adicionarVerticesExponencialmente(grafo2, 6, 2);
+    adicionarVerticesExponencialmente(grafo2, 7, 2);
+    adicionarVerticesExponencialmente(grafo2, 8, 2);
+    defineSaida(grafo2);
 
     // // Grafo 3:
-    // Grafo *grafo3 = criarGrafo(9, 1);
-    // adicionarAresta(grafo3, 0, 1, 0);
-    // adicionarAresta(grafo3, 0, 2, 0);
+    Grafo *grafo3 = criarGrafo(9, 1);
+    adicionarAresta(grafo3, 0, 1, 0);
+    adicionarAresta(grafo3, 0, 2, 0);
 
-    // adicionarAresta(grafo3, 1, 3, 0);
-    // adicionarAresta(grafo3, 1, 4, 0);
-    // adicionarAresta(grafo3, 1, 5, 0);
+    adicionarAresta(grafo3, 1, 3, 0);
+    adicionarAresta(grafo3, 1, 4, 0);
+    adicionarAresta(grafo3, 1, 5, 0);
 
-    // adicionarAresta(grafo3, 2, 6, 0);
-    // adicionarAresta(grafo3, 2, 7, 0);
-    // adicionarAresta(grafo3, 2, 8, 0);
+    adicionarAresta(grafo3, 2, 6, 0);
+    adicionarAresta(grafo3, 2, 7, 0);
+    adicionarAresta(grafo3, 2, 8, 0);
 
-    // adicionarVerticesExponencialmente(grafo3, 3, 1);
-    // adicionarVerticesExponencialmente(grafo3, 4, 1);
-    // adicionarVerticesExponencialmente(grafo3, 5, 1);
-    // adicionarVerticesExponencialmente(grafo3, 6, 2);
-    // adicionarVerticesExponencialmente(grafo3, 7, 2);
-    // adicionarVerticesExponencialmente(grafo3, 8, 2);
+    adicionarVerticesExponencialmente(grafo3, 3, 1);
+    adicionarVerticesExponencialmente(grafo3, 4, 1);
+    adicionarVerticesExponencialmente(grafo3, 5, 1);
+    adicionarVerticesExponencialmente(grafo3, 6, 2);
+    adicionarVerticesExponencialmente(grafo3, 7, 2);
+    adicionarVerticesExponencialmente(grafo3, 8, 2);
 
-    // adicionarVerticesExponencialmente(grafo3, 9, 3);
-    // adicionarVerticesExponencialmente(grafo3, 10, 3);
-    // adicionarVerticesExponencialmente(grafo3, 11, 3);
-    // adicionarVerticesExponencialmente(grafo3, 12, 3);
+    adicionarVerticesExponencialmente(grafo3, 9, 3);
+    adicionarVerticesExponencialmente(grafo3, 10, 3);
+    adicionarVerticesExponencialmente(grafo3, 11, 3);
+    adicionarVerticesExponencialmente(grafo3, 12, 3);
 
-    // adicionarVerticesExponencialmente(grafo3, 13, 4);
-    // adicionarVerticesExponencialmente(grafo3, 14, 4);
-    // adicionarVerticesExponencialmente(grafo3, 15, 4);
-    // adicionarVerticesExponencialmente(grafo3, 16, 4);
+    adicionarVerticesExponencialmente(grafo3, 13, 4);
+    adicionarVerticesExponencialmente(grafo3, 14, 4);
+    adicionarVerticesExponencialmente(grafo3, 15, 4);
+    adicionarVerticesExponencialmente(grafo3, 16, 4);
 
-    // adicionarVerticesExponencialmente(grafo3, 17, 5);
-    // adicionarVerticesExponencialmente(grafo3, 18, 5);
-    // adicionarVerticesExponencialmente(grafo3, 19, 5);
-    // adicionarVerticesExponencialmente(grafo3, 20, 5);
+    adicionarVerticesExponencialmente(grafo3, 17, 5);
+    adicionarVerticesExponencialmente(grafo3, 18, 5);
+    adicionarVerticesExponencialmente(grafo3, 19, 5);
+    adicionarVerticesExponencialmente(grafo3, 20, 5);
 
-    // adicionarVerticesExponencialmente(grafo3, 21, 6);
-    // adicionarVerticesExponencialmente(grafo3, 22, 6);
-    // adicionarVerticesExponencialmente(grafo3, 23, 6);
-    // adicionarVerticesExponencialmente(grafo3, 24, 6);
+    adicionarVerticesExponencialmente(grafo3, 21, 6);
+    adicionarVerticesExponencialmente(grafo3, 22, 6);
+    adicionarVerticesExponencialmente(grafo3, 23, 6);
+    adicionarVerticesExponencialmente(grafo3, 24, 6);
 
-    // adicionarVerticesExponencialmente(grafo3, 25, 7);
-    // adicionarVerticesExponencialmente(grafo3, 26, 7);
-    // adicionarVerticesExponencialmente(grafo3, 27, 7);
-    // adicionarVerticesExponencialmente(grafo3, 28, 7);
+    adicionarVerticesExponencialmente(grafo3, 25, 7);
+    adicionarVerticesExponencialmente(grafo3, 26, 7);
+    adicionarVerticesExponencialmente(grafo3, 27, 7);
+    adicionarVerticesExponencialmente(grafo3, 28, 7);
 
-    // adicionarVerticesExponencialmente(grafo3, 29, 8);
-    // adicionarVerticesExponencialmente(grafo3, 30, 8);
-    // adicionarVerticesExponencialmente(grafo3, 31, 8);
-    // adicionarVerticesExponencialmente(grafo3, 32, 8);
-    // defineSaida(grafo3);
+    adicionarVerticesExponencialmente(grafo3, 29, 8);
+    adicionarVerticesExponencialmente(grafo3, 30, 8);
+    adicionarVerticesExponencialmente(grafo3, 31, 8);
+    adicionarVerticesExponencialmente(grafo3, 32, 8);
+    defineSaida(grafo3);
 
     // Grafo AREA CENTRAL:
     Grafo *grafo4 = criarGrafo(9, 0);
@@ -585,9 +570,9 @@ ArvoreBinaria *inicializarAreas()
     ArvoreBinaria *arvore = criarArvore();
 
     inserir(arvore, *grafo4, 1);
-    // inserir(arvore, *grafo3, 0);
-    // inserir(arvore, *grafo2, 0);
-    // inserir(arvore, *grafo1, 0);
+    inserir(arvore, *grafo3, 0);
+    inserir(arvore, *grafo2, 0);
+    inserir(arvore, *grafo1, 0);
 
     return arvore;
 }
