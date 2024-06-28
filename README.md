@@ -26,6 +26,9 @@ The program uses a file to create a ranking, storing the top 10 positions sorted
 
 The progressive increase in the number of rooms (nodes) in each new area (level) adds complexity to the game incrementally. This can be visualized as a graph expansion, where each new level adds an additional node compared to the previous one. As depicted in the diagram, each node that increases complexity does so geometrically.
 
+> [!Note]
+> The program may not work very well on other operating systems, I'm sorry :(
+
 ## 🤝 Contributors
 [![LucasPMartins](https://github.com/LucasPMartins.png?size=60)](https://github.com/LucasPMartins "LucasPMartins on GitHub")
 [![pedrootrevisan](https://github.com/pedrootrevisan.png?size=60)](https://github.com/pedrootrevisan "Pedro Trevisan on GitHub")
