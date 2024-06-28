@@ -8,7 +8,7 @@
 **Central Maze** is a maze game created in the **C** language for a course completion project **(Algorithms and Data Structures 2)**.
 
 ### Code Organization and Data Structures:
-The code is organized and modularized using Abstract Data Types (ADTs) to facilitate maintenance and new implementations. Efficient data structures are employed in its development. The application includes the ADTs: tree, graph, stack,and ranking.
+The code is organized and modularized using Abstract Data Types (ADTs) to facilitate maintenance and new implementations. Efficient data structures are employed in its development. The application includes the ADTs: tree, graph, stack, and ranking.
 
 The program uses the Graph data structure in adjacency list format to represent the mazes, allowing users to navigate between vertices to reach an "exit" vertex while avoiding sinkholes.
 
