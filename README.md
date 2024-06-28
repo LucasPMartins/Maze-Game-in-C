@@ -8,7 +8,7 @@
 **Central Maze** is a maze game created in the **C** language for a course completion project **(Algorithms and Data Structures 2)**.
 
 ### Code Organization and Data Structures:
-The code is organized and modularized using Abstract Data Types (ADTs) to facilitate maintenance and new implementations. Efficient data structures are employed in its development. The application includes the ADTs: tree, graph, and ranking.
+The code is organized and modularized using Abstract Data Types (ADTs) to facilitate maintenance and new implementations. Efficient data structures are employed in its development. The application includes the ADTs: tree, graph, stack,and ranking.
 
 The program uses the Graph data structure in adjacency list format to represent the mazes, allowing users to navigate between vertices to reach an "exit" vertex while avoiding sinkholes.
 
@@ -19,7 +19,7 @@ In terms of gameplay, the central area allows users to return using their acquir
 Data Structure Usage:
 The Tree data structure is used as a map for the graphs (mazes), ensuring that the central area is visited last. The game progresses through traversing the tree nodes, each representing a graph.
 
-The program employs a player structure to store user information. This structure includes the player's name, number of completed levels, accumulated points, and playtime. These data are later used in the ranking system.
+The program employs a player structure to store user information. This structure includes the player's name, accumulated points, and playtime. These data are later used in the ranking system.
 
 ### **Ranking and Sorting**:
 The program uses a file to create a ranking, storing the top 10 positions sorted either by points or by the longest time spent in the Central Area. The ranking is organized using the Insertion Sort algorithm, efficiently sorting players in descending order based on the chosen criteria (time or points). This ensures that players with higher scores or times occupy higher positions in the ranking.
