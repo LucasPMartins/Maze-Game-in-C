@@ -17,7 +17,6 @@ void insertionSort(Jogador *ranking, int numJogadores, int tipo)
 
   if (numJogadores <= 0)
   {
-    printf("Nenhum jogador para ordenar.\n");
     return;
   }
 
@@ -66,15 +65,14 @@ void exibeRanking(Jogador *ranking, int numJogadores)
   if (numJogadores == 0)
   {
     printf(ANSI_COLOR_GREEN);
-    printf("\t\t    THE RANKING IS EMPTY!\n");
+    printf("\t\t    THE RANKING IS EMPTY!\n\n");
     printf(ANSI_COLOR_RESET);
     return;
   }
 
   for (int i = 0; i < numJogadores && i < 10; i++)
   {
-    printf("%d - %s\t     %.2f\t   %.2f\t\t   %d\n",
-           i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
+    printf("%d - %s\t     %.2f\t   %.2f\t\t   %d\n", i + 1, ranking[i].nome, ranking[i].tempoTotal, ranking[i].tempoAreaCentral, ranking[i].pontos);
   }
   printf("\n");
 }
@@ -118,9 +116,16 @@ void salvarRanking(const char *nomeArquivo, Jogador *ranking, int numJogadores)
     perror("Erro ao abrir o arquivo");
     exit(EXIT_FAILURE);
   }
+  if (numJogadores > 10) // Salva somente os 10 melhores
+  {
+    fwrite(ranking, sizeof(Jogador), 10, arquivo);
+  }
+  else
+  {
+    fwrite(ranking, sizeof(Jogador), numJogadores, arquivo);
+  }
 
   // Escrever os jogadores no arquivo
-  fwrite(ranking, sizeof(Jogador), numJogadores, arquivo);
 
   fclose(arquivo);
 }
@@ -164,18 +169,3 @@ Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, const char *nom
 
   return novoJogador;
 }
-// Jogador *adicionarJogador(Jogador *jogadores, int *numJogadores, char *nome)
-// {
-//   (*numJogadores) += 1;
-//   jogadores = realloc(jogadores, (*numJogadores) * sizeof(Jogador));
-//   if (!jogadores)
-//   {
-//     perror("Erro ao realocar memória");
-//     exit(EXIT_FAILURE);
-//   }
-//   strcpy(jogadores[*numJogadores - 1].nome, nome);
-//   jogadores[*numJogadores - 1].tempoAreaCentral = 0;
-//   jogadores[*numJogadores - 1].pontos = 0;
-//   jogadores[*numJogadores - 1].tempoTotal = 0;
-//   return &jogadores[*numJogadores - 1];
-// }

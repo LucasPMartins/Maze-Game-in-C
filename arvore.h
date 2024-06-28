@@ -5,7 +5,7 @@
 
 typedef struct NoArvore
 {
-    Grafo area;
+    Grafo *area;
     struct NoArvore *esquerda;
     struct NoArvore *direita;
 } NoArvore;
@@ -18,8 +18,8 @@ typedef struct ArvoreBinarias
 // Protótipos das funções
 
 ArvoreBinaria *criarArvore();
-NoArvore *criarNo(Grafo area);
-void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral);
+NoArvore *criarNo(Grafo *area);
+void inserir(ArvoreBinaria *arvore, Grafo *area, int ehAreaCentral);
 void liberarArvore(NoArvore *no);
 
 #endif // ARVORE_H

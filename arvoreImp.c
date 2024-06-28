@@ -17,7 +17,7 @@ ArvoreBinaria *criarArvore()
 }
 
 // Função para criar um nó da árvore binária
-NoArvore *criarNo(Grafo area)
+NoArvore *criarNo(Grafo *area)
 {
     NoArvore *novoNo = (NoArvore *)malloc(sizeof(NoArvore));
     if (novoNo == NULL)
@@ -32,7 +32,7 @@ NoArvore *criarNo(Grafo area)
 }
 
 // Função para inserir um nó na árvore binária
-void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral)
+void inserir(ArvoreBinaria *arvore, Grafo *area, int ehAreaCentral)
 {
     NoArvore *novoNo = criarNo(area);
 
@@ -65,7 +65,7 @@ void inserir(ArvoreBinaria *arvore, Grafo area, int ehAreaCentral)
             while (atual != NULL)
             {
                 anterior = atual;
-                if (area.V < atual->area.V)
+                if (area->V < atual->area->V)
                 {
                     atual = atual->esquerda;
                     ehEsquerda = 1; // Indica que a insercão sera nó esquerda

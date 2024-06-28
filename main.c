@@ -40,8 +40,7 @@ int main()
     char input;
 
     int numJogadores = 0;
-    Jogador *jogadores = malloc(sizeof(Jogador));
-    // lerRanking("ranking.txt", &numJogadores);
+    Jogador *jogadores = lerRanking("ranking.txt", &numJogadores);
 
     do
     {
@@ -122,6 +121,7 @@ int main()
         }
     } while (sair != 1); // Loop até que a opção "Sair" seja selecionada
 
+    insertionSort(jogadores, numJogadores, 1); // Ordena os dez melhores jogadores e salva no ranking
     salvarRanking("ranking.txt", jogadores, numJogadores);
 
     // Liberar a memória alocada para o vetor de jogadores
@@ -446,6 +446,8 @@ void iniciarJogo(Jogador *jogador)
                 }
                 if (tecla == 27) // Verifica se a tecla pressionada é o código ASCII do "Esc"
                 {
+                    if (grafo != NULL)
+                        liberarGrafo(grafo);
                     sair = 1;
                     break;
                 }
@@ -457,10 +459,13 @@ void iniciarJogo(Jogador *jogador)
         }
     }
 
+    while ((grafo = proximoNo(pilha)) != NULL)
+    {
+        liberarGrafo(grafo);
+    }
     gettimeofday(&fim, NULL); // FINALIZA O TEMPO TOTAL
     tempo = (double)(fim.tv_sec - inicio.tv_sec) + (double)(fim.tv_usec - inicio.tv_usec) / 1000000.0;
     jogador->tempoTotal = tempo;
-
     free(arvore);
     free(pilha);
 }
@@ -569,10 +574,10 @@ ArvoreBinaria *inicializarAreas()
     // Criação da Arvore Binaria
     ArvoreBinaria *arvore = criarArvore();
 
-    inserir(arvore, *grafo4, 1);
-    inserir(arvore, *grafo3, 0);
-    inserir(arvore, *grafo2, 0);
-    inserir(arvore, *grafo1, 0);
+    inserir(arvore, grafo4, 1);
+    inserir(arvore, grafo3, 0);
+    inserir(arvore, grafo2, 0);
+    inserir(arvore, grafo1, 0);
 
     return arvore;
 }

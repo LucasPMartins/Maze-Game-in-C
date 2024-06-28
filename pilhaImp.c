@@ -77,7 +77,7 @@ void preencherPilha(NoArvore *no, Pilha *pilha)
 // Função para inicializar a pilha com o caminho do último nó até a raiz
 Pilha *inicializarPercurso(ArvoreBinaria *arvore)
 {
-    Pilha *pilha = criarPilha(100); // Defina a capacidade conforme necessário
+    Pilha *pilha = criarPilha(5);
     preencherPilha(arvore->raiz, pilha);
     return pilha;
 }
@@ -90,7 +90,7 @@ Grafo *proximoNo(Pilha *pilha)
         return NULL;
     }
     NoArvore *no = desempilhar(pilha);
-    return &no->area;
+    return no->area;
 }
 
 // Função para liberar a memória da pilha
