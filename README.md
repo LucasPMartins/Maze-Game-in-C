@@ -56,7 +56,7 @@ The progressive increase in the number of rooms (nodes) in each new area (level)
 <table>
    <tr>
     <td text-align: center>
-      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/52b1d11a-d4fa-416c-a87f-ec9fef11d053" alt="Imagem 3" width="600" />
+      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/52b1d11a-d4fa-416c-a87f-ec9fef11d053" alt="Imagem 3" width="500" />
     </td>
   </tr>
 </table>
