@@ -7,6 +7,28 @@
 
 **Central Maze** is a maze game created in the **C** language for a course completion project **(Algorithms and Data Structures 2)**.
 
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/b2856451-8b46-407f-8220-25fa68f36d37" alt="Imagem Maior 1" width="500" />
+    </td>
+    <td>
+      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/7f07158b-f6a5-4a61-add6-8990d89ecea7" alt="Imagem Maior 2" width="500" />
+    </td>
+  </tr>
+</table>
+
+<div align="center">
+<table>
+   <tr>
+    <td text-align: center>
+      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/52b1d11a-d4fa-416c-a87f-ec9fef11d053" alt="Imagem 3" width="500" />
+    </td>
+  </tr>
+</table>
+</div>
+
+
 ### Code Organization and Data Structures:
 The code is organized and modularized using Abstract Data Types (ADTs) to facilitate maintenance and new implementations. Efficient data structures are employed in its development. The application includes the ADTs: tree, graph, stack, and ranking.
 
@@ -43,27 +65,6 @@ The progressive increase in the number of rooms (nodes) in each new area (level)
 
 ## 👨‍💻 Programming Language
 ![C](https://img.shields.io/badge/c-0D1117?style=for-the-badge&logo=c&logoColor=0a58ee)
-
-<table>
-  <tr>
-    <td>
-      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/b2856451-8b46-407f-8220-25fa68f36d37" alt="Imagem Maior 1" width="500" />
-    </td>
-    <td>
-      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/7f07158b-f6a5-4a61-add6-8990d89ecea7" alt="Imagem Maior 2" width="500" />
-    </td>
-  </tr>
-</table>
-
-<div align="center">
-<table>
-   <tr>
-    <td text-align: center>
-      <img src="https://github.com/LucasPMartins/Tic-tac-toe-in-C/assets/127567616/52b1d11a-d4fa-416c-a87f-ec9fef11d053" alt="Imagem 3" width="500" />
-    </td>
-  </tr>
-</table>
-</div>
 
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=03800b&height=120&section=footer"/>
 
